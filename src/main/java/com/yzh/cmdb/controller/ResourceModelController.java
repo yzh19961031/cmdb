@@ -80,13 +80,18 @@ public class ResourceModelController {
      * 获取资源模型分组列表
      *
      * @param name 名称
+     * @param isEnable 是否启用
      * @return 资源模型分组列表
      */
     @GetMapping("list")
     @Operation(summary = "获取资源模型分组列表")
-    @Parameter(name = "name", description = "名称", required = false, in = ParameterIn.QUERY)
-    public Result<List<GroupResourceModelVO>> list(@RequestParam(name = "name", required = false) String name) {
-        return Result.ok(resourceModelService.list(name));
+    @Parameters({
+            @Parameter(name = "name", description = "名称", in = ParameterIn.QUERY),
+            @Parameter(name = "enable", description = "是否启用", in = ParameterIn.QUERY)
+    })
+    public Result<List<GroupResourceModelVO>> list(@RequestParam(name = "name", required = false) String name,
+                                                   @RequestParam(name = "enable", required = false) Boolean isEnable) {
+        return Result.ok(resourceModelService.list(name, isEnable));
     }
 
 

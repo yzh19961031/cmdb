@@ -143,7 +143,7 @@ public class ResourceModelServiceImpl implements ResourceModelService {
     }
 
     @Override
-    public List<GroupResourceModelVO> list(String name) {
+    public List<GroupResourceModelVO> list(String name, Boolean isEnable) {
         List<ResourceGroupEntity> resourceGroupEntities = resourceGroupMapper.selectList(null);
         if (CollectionUtils.isEmpty(resourceGroupEntities)) {
             return Collections.emptyList();
@@ -154,6 +154,7 @@ public class ResourceModelServiceImpl implements ResourceModelService {
             Long groupId = resourceGroupEntity.getId();
             List<ResourceModelEntity> resourceModelEntities = resourceModelMapper.selectList(new LambdaQueryWrapper<ResourceModelEntity>()
                     .like(StringUtils.isNotEmpty(name), ResourceModelEntity::getName, name)
+                    .eq(Objects.nonNull(isEnable), ResourceModelEntity::getIsEnabled, isEnable)
                     .eq(ResourceModelEntity::getGroupId, groupId));
             GroupResourceModelVO groupResourceModelVO = new GroupResourceModelVO();
             groupResourceModelVO.setId(groupId);
@@ -189,7 +190,12 @@ public class ResourceModelServiceImpl implements ResourceModelService {
 
     @Override
     public void doSwitch(Long id, Boolean isEnabled) {
-
+        ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(id);
+        if (Objects.equals(isEnabled, resourceModelEntity.getIsEnabled())) {
+            return;
+        }
+        resourceModelEntity.setIsEnabled(isEnabled);
+        resourceModelMapper.updateById(resourceModelEntity);
     }
 
     private void checkResourceModel(ResourceModelDTO resourceModelDTO) {

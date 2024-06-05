@@ -1,14 +1,16 @@
 package com.yzh.cmdb.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.db.PageResult;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.yzh.cmdb.domain.PageResult;
 import com.yzh.cmdb.domain.dto.DynamicInstanceDTO;
 import com.yzh.cmdb.domain.dto.InstanceDeleteDTO;
 import com.yzh.cmdb.domain.dto.ResourceInstanceQueryDTO;
+import com.yzh.cmdb.domain.entity.ResourceAttributeEntity;
 import com.yzh.cmdb.domain.entity.ResourceInstanceRelationEntity;
 import com.yzh.cmdb.domain.entity.ResourceModelEntity;
 import com.yzh.cmdb.domain.vo.DynamicInstanceVO;
+import com.yzh.cmdb.mapper.ResourceAttributeMapper;
 import com.yzh.cmdb.mapper.ResourceInstanceRelationMapper;
 import com.yzh.cmdb.mapper.ResourceModelMapper;
 import com.yzh.cmdb.service.ResourceInstanceService;
@@ -16,6 +18,7 @@ import com.yzh.cmdb.utils.SQLGenerator;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
@@ -24,8 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 模型实例service
@@ -43,6 +49,8 @@ public class ResourceInstanceServiceImpl implements ResourceInstanceService {
     @Resource
     private ResourceModelMapper resourceModelMapper;
 
+    @Resource
+    private ResourceAttributeMapper resourceAttributeMapper;
 
     @Resource
     private ResourceInstanceRelationMapper resourceInstanceRelationMapper;
@@ -77,7 +85,39 @@ public class ResourceInstanceServiceImpl implements ResourceInstanceService {
 
     @Override
     public PageResult<DynamicInstanceVO> list(ResourceInstanceQueryDTO resourceInstanceQueryDTO) {
-        return null;
+        Long modelId = resourceInstanceQueryDTO.getModelId();
+        ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(modelId);
+        String tableName = resourceModelEntity.getTableName();
+        ParameterizedSql querySql = buildParameterizedSql(tableName, resourceInstanceQueryDTO, false);
+        List<Map<String, Object>> queryResult = jdbcTemplate.queryForList(querySql.getSql(), querySql.getParams());
+        if (CollectionUtils.isNotEmpty(queryResult)) {
+            Map<String, String> systemNameMap = new HashMap<>();
+            List<DynamicInstanceVO> dynamicInstanceVOS = new ArrayList<>();
+            // 参数组装
+            queryResult.forEach(result -> {
+                DynamicInstanceVO dynamicInstanceVO = new DynamicInstanceVO();
+                dynamicInstanceVO.setInstanceId(result.get("id").toString());
+                List<DynamicInstanceVO.Attributes> attributes = result.entrySet()
+                        .stream()
+                        .filter(entry -> !StringUtils.equals("id", entry.getKey()))
+                        .map(entry -> {
+                            Object value = entry.getValue();
+                            String key = entry.getKey();
+                            String name = systemNameMap.computeIfAbsent(key, identifier ->
+                                    resourceAttributeMapper.selectOne(new LambdaQueryWrapper<ResourceAttributeEntity>().eq(ResourceAttributeEntity::getIdentifier, identifier)).getName());
+                            return DynamicInstanceVO.Attributes.builder().value(value).identifier(key).name(name).build();
+                        })
+                        .collect(Collectors.toList());
+                dynamicInstanceVO.setResourceDetails(attributes);
+                dynamicInstanceVOS.add(dynamicInstanceVO);
+            });
+            ParameterizedSql countSql = buildParameterizedSql(tableName, resourceInstanceQueryDTO, true);
+            long count = Optional
+                    .ofNullable(jdbcTemplate.queryForObject(countSql.getSql(), Integer.class, countSql.getParams()))
+                    .orElse(0);
+            return new PageResult<>(dynamicInstanceVOS, count);
+        }
+        return new PageResult<>(Collections.emptyList(), 0L);
     }
 
     @Override

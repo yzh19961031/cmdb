@@ -1,7 +1,9 @@
 package com.yzh.cmdb.domain.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.LinkedHashMap;
 
 /**
@@ -12,16 +14,12 @@ import java.util.LinkedHashMap;
  */
 @Data
 public class DynamicInstanceDTO {
-    /**
-     * 模型的id
-     */
+    @Schema(description = "模型id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
+    @NotNull(message = "模型id不能为空")
     private Long modelId;
 
-    /**
-     * 实例id
-     */
+    @Schema(description = "实例id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private String instanceId;
-
 
     /**
      * 实例的数据 按照下面的格式接收
@@ -31,5 +29,6 @@ public class DynamicInstanceDTO {
      *     "column3": "value3"
      *   }
      */
+    @Schema(description = "实例数据", requiredMode = Schema.RequiredMode.REQUIRED)
     private LinkedHashMap<String, Object> data;
 }

@@ -1,6 +1,6 @@
 package com.yzh.cmdb.service;
 
-import cn.hutool.db.PageResult;
+import com.yzh.cmdb.domain.PageResult;
 import com.yzh.cmdb.domain.dto.DynamicInstanceDTO;
 import com.yzh.cmdb.domain.dto.InstanceDeleteDTO;
 import com.yzh.cmdb.domain.dto.ResourceInstanceQueryDTO;

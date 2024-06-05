@@ -31,9 +31,10 @@ public interface ResourceModelService {
      * 获取资源模型分组列表
      *
      * @param name 名称
+     * @param isEnable 是否启用
      * @return 资源模型分组列表
      */
-    List<GroupResourceModelVO> list(String name);
+    List<GroupResourceModelVO> list(String name, Boolean isEnable);
 
     /**
      * 批量删除

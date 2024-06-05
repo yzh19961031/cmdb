@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 /**
  * 实例关联
@@ -24,7 +25,7 @@ public class ResourceInstanceRelationDTO {
     private String sourceInstanceId;
 
     @Schema(description = "源端模型id", requiredMode = Schema.RequiredMode.REQUIRED, example = "123")
-    @NotBlank(message = "源端模型id不能为空")
+    @NotNull(message = "源端模型id不能为空")
     private Long sourceModelId;
 
     /**
@@ -35,20 +36,20 @@ public class ResourceInstanceRelationDTO {
     private String targetInstanceId;
 
     @Schema(description = "目标端模型id", requiredMode = Schema.RequiredMode.REQUIRED, example = "123")
-    @NotBlank(message = "目标端模型id不能为空")
+    @NotNull(message = "目标端模型id不能为空")
     private Long targetModelId;
 
     /**
      * 关系类型
      */
     @Schema(description = "关系类型id", requiredMode = Schema.RequiredMode.REQUIRED, example = "123")
-    @NotBlank(message = "请选择关系类型")
+    @NotNull(message = "请选择关系类型")
     private Long relationTypeId;
 
     /**
      * 关系约束
      */
     @Schema(description = "关系约束id", requiredMode = Schema.RequiredMode.REQUIRED, example = "123")
-    @NotBlank(message = "请选择关系约束")
+    @NotNull(message = "请选择关系约束")
     private Integer relationBind;
 }
