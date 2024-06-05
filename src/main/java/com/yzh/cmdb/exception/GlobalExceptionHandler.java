@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Result<String> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+    public Result<Void> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         BindingResult bindingResult = ex.getBindingResult();
         StringBuilder sb = new StringBuilder("参数校验失败:");
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
         }
         String msg = sb.toString();
         msg = msg.substring(0, msg.length() - 1);
-        return Result.ok(msg);
+        return Result.error(msg);
     }
 
 
