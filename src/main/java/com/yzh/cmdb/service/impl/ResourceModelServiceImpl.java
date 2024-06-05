@@ -195,25 +195,16 @@ public class ResourceModelServiceImpl implements ResourceModelService {
     private void checkResourceModel(ResourceModelDTO resourceModelDTO) {
         ResourceModelDTO dto = Objects.requireNonNull(resourceModelDTO, "资源模型参数不能为空！！！");
         String name = dto.getName();
-        String uniqueKey = dto.getUniqueKey();
-        // 判断名称是否重复 在当前分组内
-        if (StringUtils.isEmpty(name) || StringUtils.length(name) > 20) {
-            throw new IllegalArgumentException("模型名称不为空或长度不能超过20位！！！");
-        }
-
-        if (!ReUtil.isMatch("^[a-zA-Z][a-zA-Z0-9_]*$", uniqueKey)) {
-            throw new IllegalArgumentException("模型唯一标识只允许字母开头，包含字母，数字和下划线");
-        }
-
-        List<ResourceModelEntity> resourceModelEntities = resourceModelMapper.selectList(new LambdaQueryWrapper<ResourceModelEntity>()
+        boolean existsName = resourceModelMapper.exists(new LambdaQueryWrapper<ResourceModelEntity>()
                 .eq(ResourceModelEntity::getName, name));
-        if (CollectionUtils.isNotEmpty(resourceModelEntities)) {
+        if (existsName) {
             throw new IllegalArgumentException("模型名称重复！！！");
         }
 
-        List<ResourceModelEntity> uniqueKeyList = resourceModelMapper.selectList(new LambdaQueryWrapper<ResourceModelEntity>()
-                .eq(ResourceModelEntity::getUniqueKey, dto.getUniqueKey()));
-        if (CollectionUtils.isNotEmpty(uniqueKeyList)) {
+        String uniqueKey = dto.getUniqueKey();
+        boolean existsUniqueKey = resourceModelMapper.exists(new LambdaQueryWrapper<ResourceModelEntity>()
+                .eq(ResourceModelEntity::getUniqueKey, uniqueKey));
+        if (existsUniqueKey) {
             throw new IllegalArgumentException("唯一标识重复");
         }
     }

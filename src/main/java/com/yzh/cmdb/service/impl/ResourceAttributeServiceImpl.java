@@ -123,29 +123,20 @@ public class ResourceAttributeServiceImpl implements ResourceAttributeService {
     private void checkResourceAttribute(ResourceAttributeDTO resourceAttributeDTO) {
         ResourceAttributeDTO attributeDTO = Objects.requireNonNull(resourceAttributeDTO, "属性参数不能为空");
         String name = attributeDTO.getName();
-        if (StringUtils.isEmpty(name) || StringUtils.length(name) > 20) {
-            throw new IllegalArgumentException("属性名称不为空或者不能超过20位");
+
+        Long modelId = attributeDTO.getModelId();
+        boolean existsName = resourceAttributeMapper.exists(new LambdaQueryWrapper<ResourceAttributeEntity>()
+                .eq(ResourceAttributeEntity::getModelId, modelId)
+                .eq(ResourceAttributeEntity::getName, name));
+        if (existsName) {
+            throw new IllegalArgumentException("属性名称重复");
         }
 
         String identifier = attributeDTO.getIdentifier();
-        if (!ReUtil.isMatch("^[a-zA-Z][a-zA-Z0-9_]*$", identifier)) {
-            throw new IllegalArgumentException("属性标识只允许字母开头，包含字母，数字和下划线");
-        }
-        if (StringUtils.isEmpty(identifier) || StringUtils.length(identifier) > 50) {
-            throw new IllegalArgumentException("属性标识不为空或者不能超过50位");
-        }
-
-        Long modelId = attributeDTO.getModelId();
-        List<ResourceAttributeEntity> resourceAttributeEntities = resourceAttributeMapper.selectList(new LambdaQueryWrapper<ResourceAttributeEntity>()
-                .eq(ResourceAttributeEntity::getModelId, modelId)
-                .eq(ResourceAttributeEntity::getName, name));
-        if (CollectionUtils.isNotEmpty(resourceAttributeEntities)) {
-            throw new IllegalArgumentException("属性名称重复");
-        }
-        List<ResourceAttributeEntity> resourceAttributeEntityList = resourceAttributeMapper.selectList(new LambdaQueryWrapper<ResourceAttributeEntity>()
+        boolean existsIdentifier = resourceAttributeMapper.exists(new LambdaQueryWrapper<ResourceAttributeEntity>()
                 .eq(ResourceAttributeEntity::getModelId, modelId)
                 .eq(ResourceAttributeEntity::getIdentifier, identifier));
-        if (CollectionUtils.isNotEmpty(resourceAttributeEntityList)) {
+        if (existsIdentifier) {
             throw new IllegalArgumentException("属性标识重复");
         }
     }

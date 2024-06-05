@@ -3,6 +3,9 @@ package com.yzh.cmdb.controller;
 import com.yzh.cmdb.domain.Result;
 import com.yzh.cmdb.domain.dto.ResourceGroupDTO;
 import com.yzh.cmdb.service.ResourceGroupService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +40,7 @@ public class ResourceGroupController {
      * @return res
      */
     @PostMapping("add")
+    @Operation(summary = "新增分组")
     public Result<Void> add(@Valid @RequestBody ResourceGroupDTO resourceGroupDTO) {
         resourceGroupService.add(resourceGroupDTO);
         return Result.ok();
@@ -49,6 +53,8 @@ public class ResourceGroupController {
      * @return res
      */
     @PostMapping("delete")
+    @Operation(summary = "删除分组")
+    @Parameter(name = "id", description = "分组id", required = true, in = ParameterIn.QUERY)
     public Result<Void> delete(@RequestParam("id") Long id) {
         resourceGroupService.delete(id);
         return Result.ok();
@@ -61,7 +67,8 @@ public class ResourceGroupController {
      * @return res
      */
     @PostMapping("update")
-    public Result<Void> update(@RequestBody ResourceGroupDTO resourceGroupDTO) {
+    @Operation(summary = "更新分组")
+    public Result<Void> update(@Valid @RequestBody ResourceGroupDTO resourceGroupDTO) {
         resourceGroupService.update(resourceGroupDTO);
         return Result.ok();
     }
@@ -73,6 +80,7 @@ public class ResourceGroupController {
      * @return 分组列表
      */
     @GetMapping("list")
+    @Operation(summary = "获取分组列表")
     public Result<List<ResourceGroupDTO>> list() {
         return Result.ok(resourceGroupService.list());
     }

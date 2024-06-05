@@ -14,6 +14,10 @@ create table relation_type
 )
     comment '关系类型';
 
+INSERT INTO cmdb.relation_type (id, name, description, create_at) VALUES (1, '属于', '属于', '2024-05-14 09:18:57');
+INSERT INTO cmdb.relation_type (id, name, description, create_at) VALUES (2, '包含', '包含', '2024-05-14 09:18:57');
+
+
 create table resource_attr
 (
     id                 bigint auto_increment comment '主键'

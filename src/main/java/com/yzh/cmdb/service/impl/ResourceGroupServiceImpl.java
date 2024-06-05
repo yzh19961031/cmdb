@@ -74,16 +74,6 @@ public class ResourceGroupServiceImpl implements ResourceGroupService {
     private void checkResourceGroup(ResourceGroupDTO resourceGroupDTO, boolean isNew) {
         ResourceGroupDTO groupDTO = Objects.requireNonNull(resourceGroupDTO, "分组信息不能为空");
         String name = groupDTO.getName();
-        if (Objects.isNull(name)) {
-            throw new IllegalArgumentException("分组名称不能为空");
-        }
-        if (StringUtils.length(name) > 20) {
-            throw new IllegalArgumentException("分组名称最长不能超过20位");
-        }
-        String description = groupDTO.getDescription();
-        if (StringUtils.length(description) > 500) {
-            throw new IllegalArgumentException("分组描述长度不能超过500位");
-        }
         if (isNew) {
             boolean exists = resourceGroupMapper.exists(new LambdaQueryWrapper<ResourceGroupEntity>().eq(ResourceGroupEntity::getName, name));
             if (exists) {

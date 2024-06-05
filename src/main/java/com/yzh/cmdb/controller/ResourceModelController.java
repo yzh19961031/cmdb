@@ -4,6 +4,10 @@ import com.yzh.cmdb.domain.Result;
 import com.yzh.cmdb.domain.dto.ResourceModelDTO;
 import com.yzh.cmdb.domain.vo.GroupResourceModelVO;
 import com.yzh.cmdb.service.ResourceModelService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +41,7 @@ public class ResourceModelController {
      * @return res
      */
     @PostMapping("add")
+    @Operation(summary = "添加资源模型")
     public Result<Void> add(@Valid @RequestBody ResourceModelDTO resourceModelDTO) {
         resourceModelService.add(resourceModelDTO);
         return Result.ok();
@@ -50,6 +55,8 @@ public class ResourceModelController {
      * @return res
      */
     @PostMapping("delete")
+    @Operation(summary = "删除指定模型")
+    @Parameter(name = "id", description = "模型id", required = true, in = ParameterIn.QUERY)
     public Result<Void> delete(@RequestParam("id") Long id) {
         resourceModelService.delete(id);
         return Result.ok();
@@ -63,6 +70,7 @@ public class ResourceModelController {
      * @return res
      */
     @PostMapping("batchDelete")
+    @Operation(summary = "批量删除")
     public Result<Void> batchDelete(@RequestBody List<Long> ids) {
         resourceModelService.batchDelete(ids);
         return Result.ok();
@@ -75,6 +83,8 @@ public class ResourceModelController {
      * @return 资源模型分组列表
      */
     @GetMapping("list")
+    @Operation(summary = "获取资源模型分组列表")
+    @Parameter(name = "name", description = "名称", required = false, in = ParameterIn.QUERY)
     public Result<List<GroupResourceModelVO>> list(@RequestParam(name = "name", required = false) String name) {
         return Result.ok(resourceModelService.list(name));
     }
@@ -87,6 +97,8 @@ public class ResourceModelController {
      * @return 模型详情
      */
     @GetMapping("detail")
+    @Operation(summary = "获取模型详情")
+    @Parameter(name = "id", description = "模型id", required = true, in = ParameterIn.QUERY)
     public Result<ResourceModelDTO> detail(@RequestParam("id") Long id) {
         return Result.ok(resourceModelService.detail(id));
     }
@@ -100,6 +112,11 @@ public class ResourceModelController {
      * @return res
      */
     @PostMapping("switch")
+    @Operation(summary = "启停")
+    @Parameters({
+            @Parameter(name = "id", description = "模型id", required = true, in = ParameterIn.QUERY),
+            @Parameter(name = "enable", description = "是否启用", required = true, in = ParameterIn.QUERY)
+    })
     public Result<Void> doSwitch(@RequestParam("id") Long id, @RequestParam("enable") Boolean isEnabled) {
         resourceModelService.doSwitch(id, isEnabled);
         return Result.ok();
