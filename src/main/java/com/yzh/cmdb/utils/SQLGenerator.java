@@ -205,6 +205,42 @@ public class SQLGenerator {
 
 
     /**
+     * 生成查询SQL语句
+     *
+     * @param tableName 表名
+     * @param selectColumnNames 查询的列名
+     * @param conditionalColumnNames 条件列名
+     * @return ex: SELECT id, name, age FROM users WHERE id = ? AND status = ?
+     */
+    public static String generateSelectSQL(String tableName, List<String> selectColumnNames, List<String> conditionalColumnNames) {
+        if (StringUtils.isEmpty(tableName)) {
+            throw new IllegalArgumentException("Table name cannot be null or empty");
+        }
+        if (CollectionUtils.isEmpty(selectColumnNames)) {
+            throw new IllegalArgumentException("Select column names cannot be null or empty");
+        }
+
+        StringJoiner selectColumns = new StringJoiner(", ");
+        for (String column : selectColumnNames) {
+            selectColumns.add(column);
+        }
+
+        StringBuilder whereClause = new StringBuilder();
+        if (CollectionUtils.isNotEmpty(conditionalColumnNames)) {
+            StringJoiner conditions = new StringJoiner(" AND ");
+            for (String column : conditionalColumnNames) {
+                conditions.add(column + " = ?");
+            }
+            whereClause.append(" WHERE ").append(conditions);
+        } else {
+            whereClause.append(" WHERE 1 = 1");
+        }
+
+        return "SELECT " + selectColumns + " FROM " + tableName + whereClause;
+    }
+
+
+    /**
      * 生成删除语句
      *
      * @param tableName 表名

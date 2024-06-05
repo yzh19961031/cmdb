@@ -9,12 +9,17 @@ import com.yzh.cmdb.domain.dto.ResourceInstanceQueryDTO;
 import com.yzh.cmdb.domain.entity.ResourceAttributeEntity;
 import com.yzh.cmdb.domain.entity.ResourceInstanceRelationEntity;
 import com.yzh.cmdb.domain.entity.ResourceModelEntity;
+import com.yzh.cmdb.domain.entity.ResourceValidationEntity;
 import com.yzh.cmdb.domain.vo.DynamicInstanceVO;
+import com.yzh.cmdb.exception.CmdbException;
 import com.yzh.cmdb.mapper.ResourceAttributeMapper;
 import com.yzh.cmdb.mapper.ResourceInstanceRelationMapper;
 import com.yzh.cmdb.mapper.ResourceModelMapper;
+import com.yzh.cmdb.mapper.ResourceValidationMapper;
 import com.yzh.cmdb.service.ResourceInstanceService;
 import com.yzh.cmdb.utils.SQLGenerator;
+import com.yzh.cmdb.validator.ValidatorChain;
+import com.yzh.cmdb.validator.impl.UniqueValidator;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +35,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -54,6 +61,9 @@ public class ResourceInstanceServiceImpl implements ResourceInstanceService {
 
     @Resource
     private ResourceInstanceRelationMapper resourceInstanceRelationMapper;
+
+    @Resource
+    private ResourceValidationMapper resourceValidationMapper;
 
 
     @Override
@@ -127,13 +137,46 @@ public class ResourceInstanceServiceImpl implements ResourceInstanceService {
 
     @Override
     public DynamicInstanceVO detail(Long modelId, String instanceId) {
-        return null;
+        ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(modelId);
+        String tableName = resourceModelEntity.getTableName();
+        String selectSQL = SQLGenerator.generateSelectSQL(tableName, Collections.singletonList("*"), Collections.singletonList("id"));
+
+        Map<String, Object> objectMap = jdbcTemplate.queryForMap(selectSQL, instanceId);
+        DynamicInstanceVO dynamicInstanceVO = new DynamicInstanceVO();
+        Map<String, ResourceAttributeEntity> attributeEntityMap = resourceAttributeMapper.selectList(new LambdaQueryWrapper<ResourceAttributeEntity>()
+                        .eq(ResourceAttributeEntity::getModelId, modelId))
+                .stream()
+                .collect(Collectors.toMap(ResourceAttributeEntity::getIdentifier, Function.identity()));
+
+        List<DynamicInstanceVO.Attributes> resourceDetails = new ArrayList<>();
+        objectMap.forEach((key, value) -> {
+            if (attributeEntityMap.containsKey(key)) {
+                DynamicInstanceVO.Attributes attributes = new DynamicInstanceVO.Attributes();
+                attributes.setIdentifier(key);
+                attributes.setValue(value);
+                attributes.setName(attributeEntityMap.get(key).getName());
+                resourceDetails.add(attributes);
+            }
+        });
+
+        dynamicInstanceVO.setResourceDetails(resourceDetails);
+        return dynamicInstanceVO;
     }
 
-
-
+    
     private void checkInstanceDTO(DynamicInstanceDTO dynamicInstanceDTO) {
+        // 判断参数类型是否正确
+        Objects.requireNonNull(dynamicInstanceDTO, "实例参数不能为空！");
 
+        // 校验唯一规则
+        Long modelId = dynamicInstanceDTO.getModelId();
+        List<ResourceValidationEntity> resourceValidationEntities = resourceValidationMapper.selectList(new LambdaQueryWrapper<ResourceValidationEntity>().eq(ResourceValidationEntity::getModelId, modelId));
+        if (CollectionUtils.isNotEmpty(resourceValidationEntities)) {
+            ValidatorChain<DynamicInstanceDTO> validatorChain = new ValidatorChain<>(resourceValidationEntities.stream().map(UniqueValidator::new).collect(Collectors.toSet()));
+            if (!validatorChain.doValidate(dynamicInstanceDTO)) {
+                throw new CmdbException("实例参数非法，唯一校验规则失败！！！");
+            }
+        }
     }
 
 
