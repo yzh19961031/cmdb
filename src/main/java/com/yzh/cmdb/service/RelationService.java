@@ -1,6 +1,7 @@
 package com.yzh.cmdb.service;
 
-import com.yzh.cmdb.domain.entity.RelationTypeEntity;
+
+import com.yzh.cmdb.domain.vo.RelationTypeVO;
 
 import java.util.List;
 
@@ -17,5 +18,5 @@ public interface RelationService {
      *
      * @return 列表
      */
-    List<RelationTypeEntity> list();
+    List<RelationTypeVO> list();
 }

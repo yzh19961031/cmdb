@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -110,6 +111,25 @@ public class ResourceRelationServiceImpl implements ResourceRelationService {
                 .collect(Collectors.toList());
 
         return ResourceModelTopologyVO.builder().edges(edges).nodes(nodes).build();
+    }
+
+    @Override
+    public List<ResourceRelationVO> listAll() {
+        List<ResourceRelationEntity> resourceRelationEntities = resourceRelationMapper.selectList(null);
+        if (CollectionUtils.isEmpty(resourceRelationEntities)) {
+            return Collections.emptyList();
+        }
+
+        // 这边查询可以用map缓存一下
+        return resourceRelationEntities.stream().map(resourceRelationEntity -> {
+            ResourceRelationVO resourceRelationVO = new ResourceRelationVO();
+            BeanUtils.copyProperties(resourceRelationEntity, resourceRelationVO);
+            resourceRelationVO.setRelationBindName(RelationBindEnum.getByValue(resourceRelationVO.getRelationBind()).getDesc());
+            resourceRelationVO.setRelationName(relationTypeMapper.selectById(resourceRelationVO.getRelationTypeId()).getName());
+            resourceRelationVO.setSourceModelName(resourceModelMapper.selectById(resourceRelationVO.getSourceId()).getName());
+            resourceRelationVO.setTargetModelName(resourceModelMapper.selectById(resourceRelationVO.getTargetId()).getName());
+            return resourceRelationVO;
+        }).collect(Collectors.toList());
     }
 
     /**

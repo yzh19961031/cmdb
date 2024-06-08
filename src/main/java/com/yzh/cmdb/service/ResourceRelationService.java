@@ -3,6 +3,9 @@ package com.yzh.cmdb.service;
 import com.yzh.cmdb.domain.dto.ResourceRelationDTO;
 import com.yzh.cmdb.domain.vo.GroupResourceRelationVO;
 import com.yzh.cmdb.domain.vo.ResourceModelTopologyVO;
+import com.yzh.cmdb.domain.vo.ResourceRelationVO;
+
+import java.util.List;
 
 /**
  * 模型关联
@@ -40,4 +43,12 @@ public interface ResourceRelationService {
      * @return 拓扑详情
      */
     ResourceModelTopologyVO recursiveTopology();
+
+
+    /**
+     * 获取所有模型关联列表
+     *
+     * @return 模型关联列表
+     */
+    List<ResourceRelationVO> listAll();
 }

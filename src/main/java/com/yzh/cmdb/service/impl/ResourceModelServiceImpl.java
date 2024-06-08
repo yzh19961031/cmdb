@@ -1,7 +1,6 @@
 package com.yzh.cmdb.service.impl;
 
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.ReUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yzh.cmdb.domain.dto.ColumnDefinitionDTO;
 import com.yzh.cmdb.domain.dto.ResourceAttributeDTO;
@@ -196,6 +195,19 @@ public class ResourceModelServiceImpl implements ResourceModelService {
         }
         resourceModelEntity.setIsEnabled(isEnabled);
         resourceModelMapper.updateById(resourceModelEntity);
+    }
+
+    @Override
+    public List<ResourceModelVO> listAll() {
+        List<ResourceModelEntity> resourceModelEntities = resourceModelMapper.selectList(null);
+        if (CollectionUtils.isEmpty(resourceModelEntities)) {
+            return Collections.emptyList();
+        }
+        return resourceModelEntities.stream().map(resourceModelEntity -> {
+            ResourceModelVO resourceModelVO = new ResourceModelVO();
+            BeanUtils.copyProperties(resourceModelEntity, resourceModelVO);
+            return resourceModelVO;
+        }).collect(Collectors.toList());
     }
 
     private void checkResourceModel(ResourceModelDTO resourceModelDTO) {

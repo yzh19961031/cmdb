@@ -1,7 +1,7 @@
 package com.yzh.cmdb.controller;
 
 import com.yzh.cmdb.domain.Result;
-import com.yzh.cmdb.domain.entity.RelationTypeEntity;
+import com.yzh.cmdb.domain.vo.RelationTypeVO;
 import com.yzh.cmdb.service.RelationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +33,7 @@ public class RelationController {
      */
     @GetMapping("list")
     @Operation(summary = "获取所有的关系类型列表")
-    public Result<List<RelationTypeEntity>> list() {
+    public Result<List<RelationTypeVO>> list() {
         return Result.ok(relationService.list());
     }
 }

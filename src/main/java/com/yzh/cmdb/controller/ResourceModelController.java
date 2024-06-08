@@ -3,6 +3,7 @@ package com.yzh.cmdb.controller;
 import com.yzh.cmdb.domain.Result;
 import com.yzh.cmdb.domain.dto.ResourceModelDTO;
 import com.yzh.cmdb.domain.vo.GroupResourceModelVO;
+import com.yzh.cmdb.domain.vo.ResourceModelVO;
 import com.yzh.cmdb.service.ResourceModelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -92,6 +93,18 @@ public class ResourceModelController {
     public Result<List<GroupResourceModelVO>> list(@RequestParam(name = "name", required = false) String name,
                                                    @RequestParam(name = "enable", required = false) Boolean isEnable) {
         return Result.ok(resourceModelService.list(name, isEnable));
+    }
+
+
+    /**
+     * 获取所有的模型列表
+     *
+     * @return 模型列表
+     */
+    @GetMapping("listAll")
+    @Operation(summary = "获取所有的模型列表")
+    public Result<List<ResourceModelVO>> listAll() {
+        return Result.ok(resourceModelService.listAll());
     }
 
 

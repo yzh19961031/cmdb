@@ -1,6 +1,5 @@
 package com.yzh.cmdb.service.impl;
 
-import cn.hutool.core.util.ReUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yzh.cmdb.domain.dto.ColumnDefinitionDTO;
 import com.yzh.cmdb.domain.dto.ResourceAttributeDTO;

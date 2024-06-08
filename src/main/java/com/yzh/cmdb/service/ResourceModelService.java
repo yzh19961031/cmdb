@@ -2,6 +2,7 @@ package com.yzh.cmdb.service;
 
 import com.yzh.cmdb.domain.dto.ResourceModelDTO;
 import com.yzh.cmdb.domain.vo.GroupResourceModelVO;
+import com.yzh.cmdb.domain.vo.ResourceModelVO;
 
 import java.util.List;
 
@@ -59,4 +60,12 @@ public interface ResourceModelService {
      * @param isEnabled T 启用 F 不启用
      */
     void doSwitch(Long id, Boolean isEnabled);
+
+
+    /**
+     * 获取所有的模型列表
+     *
+     * @return 模型列表
+     */
+    List<ResourceModelVO> listAll();
 }

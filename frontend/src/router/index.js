@@ -55,6 +55,54 @@ export const constantRoutes = [
     }]
   },
 
+  {
+    path: '/instance',
+    component: Layout,
+    redirect: '/instance',
+    name: '资源管理',
+    children: [{
+      path: 'instance',
+      name: '资源管理',
+      component: () => import('@/views/instance/index'),
+      meta: { title: '资源管理', icon: 'el-icon-files' }
+    }]
+  },
+
+  {
+    path: '/model',
+    component: Layout,
+    redirect: '/model',
+    name: '模型管理',
+    meta: { title: '模型管理', icon: 'el-icon-s-help' },
+    children: [
+      {
+        path: 'manage',
+        name: '模型配置',
+        component: () => import('@/views/model/manage/index'),
+        meta: { title: '模型配置', icon: 'el-icon-s-operation' }
+      },
+      {
+        path: 'relation',
+        name: '模型关系',
+        component: () => import('@/views/model/relation/index'),
+        meta: { title: '模型关系', icon: 'el-icon-set-up' }
+      }
+    ]
+  },
+
+  {
+    path: '/relation',
+    component: Layout,
+    redirect: '/relation',
+    name: '关系类型',
+    children: [{
+      path: 'relation',
+      name: '关系类型',
+      component: () => import('@/views/relation/index'),
+      meta: { title: '关系类型', icon: 'el-icon-coin' }
+    }]
+  },
+
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

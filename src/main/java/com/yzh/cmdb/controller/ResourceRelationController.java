@@ -4,6 +4,7 @@ import com.yzh.cmdb.domain.Result;
 import com.yzh.cmdb.domain.dto.ResourceRelationDTO;
 import com.yzh.cmdb.domain.vo.GroupResourceRelationVO;
 import com.yzh.cmdb.domain.vo.ResourceModelTopologyVO;
+import com.yzh.cmdb.domain.vo.ResourceRelationVO;
 import com.yzh.cmdb.service.ResourceRelationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 模型关联控制器
@@ -86,5 +88,17 @@ public class ResourceRelationController {
     @Operation(summary = "生成模型拓扑图")
     public Result<ResourceModelTopologyVO> recursiveTopology() {
         return Result.ok(resourceRelationService.recursiveTopology());
+    }
+
+
+    /**
+     * 获取所有模型关联列表
+     *
+     * @return 模型关联列表
+     */
+    @GetMapping("listAll")
+    @Operation(summary = "获取所有模型关联列表")
+    public Result<List<ResourceRelationVO>> listAll() {
+        return Result.ok(resourceRelationService.listAll());
     }
 }
