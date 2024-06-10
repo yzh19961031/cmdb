@@ -6,3 +6,11 @@ export function list() {
     method: 'get'
   })
 }
+
+export function add(data) {
+  return request({
+    url: '/relation/add',
+    method: 'post',
+    data
+  })
+}

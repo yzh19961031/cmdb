@@ -8,7 +8,7 @@
         </div>
       </el-header>
       <el-main>
-        <el-dialog title="新增关系" label-width="100px" :visible.sync="dialogVisible">
+        <el-dialog title="新增关系" label-width="100px" :visible.sync="dialogVisible" :before-close="handleClose">
           <el-form :model="form" ref="form" :rules="rules">
             <el-form-item label="源模型" label-width="120px" prop="sourceId">
               <el-select v-model="form.sourceId" placeholder="请选择源模型">
@@ -294,32 +294,36 @@ export default {
         })
       })
     },
+    handleClose(done) {
+      this.resetForm('form');
+      done();
+    }
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.active {
-  color: #409EFF; /* Element UI primary color */
-  font-weight: bold;
-}
+  .active {
+    color: #409EFF; /* Element UI primary color */
+    font-weight: bold;
+  }
 
-.largeText {
-  font-size: 16px; /* Adjust font size as needed */
-}
+  .largeText {
+    font-size: 16px; /* Adjust font size as needed */
+  }
 
-.table-container {
-  margin-top: -10px; /* 调整上边距 */
-}
+  .table-container {
+    margin-top: -10px; /* 调整上边距 */
+  }
 
-.header-bar {
-  margin-bottom: 10px; /* 调整按钮和表格之间的间距 */
-  display: flex;
-  justify-content: flex-start; /* 将按钮靠左对齐 */
-}
+  .header-bar {
+    margin-bottom: 10px; /* 调整按钮和表格之间的间距 */
+    display: flex;
+    justify-content: flex-start; /* 将按钮靠左对齐 */
+  }
 
-.el-select {
-  width: 100%;
-}
+  .el-select {
+    width: 100%;
+  }
 
 </style>

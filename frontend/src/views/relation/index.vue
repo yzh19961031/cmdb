@@ -1,5 +1,25 @@
 <template>
   <div class="app-container">
+    <el-dialog title="新增关系类型" label-width="100px" :visible.sync="dialogVisible" :before-close="handleClose">
+      <el-form :model="form" ref="form" :rules="rules">
+        <el-form-item label="名称" label-width="120px" prop="name">
+          <el-input v-model="form.name" placeholder="请输入关系类型名称">
+          </el-input>
+        </el-form-item>
+        <el-form-item label="描述" label-width="120px" prop="description">
+          <el-input type="textarea" v-model="form.description" placeholder="请输入关系类型描述">
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="resetForm('form')">取 消</el-button>
+        <el-button type="primary" @click="submitForm('form')">确 定</el-button>
+      </div>
+    </el-dialog>
+
+    <div class="header-bar">
+      <el-button type="primary" @click="addRelation" class="add-relation-btn">新增关系类型</el-button>
+    </div>
     <el-table
       :data="tableData"
       border
@@ -29,14 +49,22 @@
 
 <script>
 
-import {list} from "@/api/relation";
+import {list, add} from "@/api/relation";
 
 export default {
   name: 'Relation',
   data() {
     return {
       // 表格数据
-      tableData: []
+      tableData: [],
+      form: {
+        name: '',
+        description: ''
+      },
+      rules: {
+        name: [{ required: true, message: '请输入关系类型名称', trigger: 'blur' }]
+      },
+      dialogVisible: false
     }
   },
 
@@ -49,6 +77,39 @@ export default {
       list().then(response => {
         this.tableData = response.data
       })
+    },
+    addRelation() {
+      this.dialogVisible = true
+    },
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          // 提交表单
+          add(this.form).then(response => {
+            if (response.code === 0) {
+              this.$message({
+                message: '新增成功',
+                type: 'success'
+              })
+              this.resetForm(formName)
+              this.dialogVisible = false
+              this.fetchData()
+            } else {
+
+            }
+          })
+        } else {
+          return false;
+        }
+      });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields()
+      this.dialogVisible = false
+    },
+    handleClose(done) {
+      this.resetForm('form');
+      done();
     }
   }
 
@@ -56,5 +117,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-
+  .header-bar {
+    margin-bottom: 10px; /* 调整按钮和表格之间的间距 */
+    display: flex;
+    justify-content: flex-start; /* 将按钮靠左对齐 */
+  }
 </style>

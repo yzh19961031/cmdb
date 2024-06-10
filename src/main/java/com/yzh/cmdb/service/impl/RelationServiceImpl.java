@@ -1,6 +1,9 @@
 package com.yzh.cmdb.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.yzh.cmdb.domain.entity.RelationTypeEntity;
 import com.yzh.cmdb.domain.vo.RelationTypeVO;
+import com.yzh.cmdb.exception.CmdbException;
 import com.yzh.cmdb.mapper.RelationTypeMapper;
 import com.yzh.cmdb.service.RelationService;
 import org.springframework.beans.BeanUtils;
@@ -32,5 +35,17 @@ public class RelationServiceImpl implements RelationService {
                     BeanUtils.copyProperties(relationTypeEntity, relationTypeVO);
                     return relationTypeVO;
                 }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void add(RelationTypeVO relationTypeVO) {
+        String name = relationTypeVO.getName();
+        boolean exists = relationTypeMapper.exists(new LambdaQueryWrapper<RelationTypeEntity>().eq(RelationTypeEntity::getName, name));
+        if (exists) {
+            throw new CmdbException("关系类型【" + name + " 】已存在！");
+        }
+        RelationTypeEntity relationTypeEntity = new RelationTypeEntity();
+        BeanUtils.copyProperties(relationTypeVO, relationTypeEntity);
+        relationTypeMapper.insert(relationTypeEntity);
     }
 }

@@ -7,9 +7,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 /**
@@ -35,5 +38,18 @@ public class RelationController {
     @Operation(summary = "获取所有的关系类型列表")
     public Result<List<RelationTypeVO>> list() {
         return Result.ok(relationService.list());
+    }
+
+    /**
+     * 新增关系类型
+     *
+     * @param relationTypeVO 关系类型详情
+     * @return res
+     */
+    @PostMapping("add")
+    @Operation(summary = "新增关系类型")
+    public Result<Void> add(@Valid @RequestBody RelationTypeVO relationTypeVO) {
+        relationService.add(relationTypeVO);
+        return Result.ok();
     }
 }

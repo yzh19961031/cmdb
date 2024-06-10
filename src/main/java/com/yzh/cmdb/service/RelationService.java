@@ -19,4 +19,12 @@ public interface RelationService {
      * @return 列表
      */
     List<RelationTypeVO> list();
+
+
+    /**
+     * 新增关系类型
+     *
+     * @param relationTypeVO 关系类型详情
+     */
+    void add(RelationTypeVO relationTypeVO);
 }
