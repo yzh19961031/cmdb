@@ -81,18 +81,13 @@ public class ResourceModelController {
      * 获取资源模型分组列表
      *
      * @param name 名称
-     * @param isEnable 是否启用
      * @return 资源模型分组列表
      */
     @GetMapping("list")
     @Operation(summary = "获取资源模型分组列表")
-    @Parameters({
-            @Parameter(name = "name", description = "名称", in = ParameterIn.QUERY),
-            @Parameter(name = "enable", description = "是否启用", in = ParameterIn.QUERY)
-    })
-    public Result<List<GroupResourceModelVO>> list(@RequestParam(name = "name", required = false) String name,
-                                                   @RequestParam(name = "enable", required = false) Boolean isEnable) {
-        return Result.ok(resourceModelService.list(name, isEnable));
+    @Parameters({@Parameter(name = "name", description = "名称", in = ParameterIn.QUERY)})
+    public Result<List<GroupResourceModelVO>> list(@RequestParam(name = "name", required = false) String name) {
+        return Result.ok(resourceModelService.list(name));
     }
 
 
@@ -119,24 +114,5 @@ public class ResourceModelController {
     @Parameter(name = "id", description = "模型id", required = true, in = ParameterIn.QUERY)
     public Result<ResourceModelDTO> detail(@RequestParam("id") Long id) {
         return Result.ok(resourceModelService.detail(id));
-    }
-
-
-    /**
-     * 启停
-     *
-     * @param id 模型id
-     * @param isEnabled T 启用 F 不启用
-     * @return res
-     */
-    @PostMapping("switch")
-    @Operation(summary = "启停")
-    @Parameters({
-            @Parameter(name = "id", description = "模型id", required = true, in = ParameterIn.QUERY),
-            @Parameter(name = "enable", description = "是否启用", required = true, in = ParameterIn.QUERY)
-    })
-    public Result<Void> doSwitch(@RequestParam("id") Long id, @RequestParam("enable") Boolean isEnabled) {
-        resourceModelService.doSwitch(id, isEnabled);
-        return Result.ok();
     }
 }

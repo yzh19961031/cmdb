@@ -85,10 +85,8 @@ public class ResourceInstanceRelationServiceImpl implements ResourceInstanceRela
         // 子节点
         List<ResourceRelationEntity> childResourceRelationEntities = resourceRelationMapper.selectList(new LambdaQueryWrapper<ResourceRelationEntity>()
                 .eq(ResourceRelationEntity::getSourceId, modelId));
-        // 过滤未开启
         if (CollectionUtils.isNotEmpty(childResourceRelationEntities)) {
-            childResourceRelationEntities.stream()
-                    .filter(child -> resourceModelMapper.selectById(child.getTargetId()).getIsEnabled())
+            childResourceRelationEntities
                     .forEach(resourceRelationEntity -> {
                         ResourceInstanceRelationVO resourceInstanceRelationVO = new ResourceInstanceRelationVO();
                         Long targetId = resourceRelationEntity.getTargetId();
@@ -117,8 +115,7 @@ public class ResourceInstanceRelationServiceImpl implements ResourceInstanceRela
         List<ResourceRelationEntity> parentResourceRelationEntities = resourceRelationMapper.selectList(new LambdaQueryWrapper<ResourceRelationEntity>()
                 .eq(ResourceRelationEntity::getTargetId, modelId));
         if (CollectionUtils.isNotEmpty(parentResourceRelationEntities)) {
-            parentResourceRelationEntities.stream()
-                    .filter(parent -> resourceModelMapper.selectById(parent.getSourceId()).getIsEnabled())
+            parentResourceRelationEntities
                     .forEach(resourceRelationEntity -> {
                         ResourceInstanceRelationVO resourceInstanceRelationVO = new ResourceInstanceRelationVO();
                         Long sourceId = resourceRelationEntity.getSourceId();
@@ -167,9 +164,6 @@ public class ResourceInstanceRelationServiceImpl implements ResourceInstanceRela
                 Long modelId = relation.getSourceModelId();
                 String instanceId = relation.getSourceInstanceId();
                 ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(modelId);
-                if (!resourceModelEntity.getIsEnabled()) {
-                    continue;
-                }
                 parentNode.setInstanceRelationId(relation.getId());
                 parentNode.setInstanceId(instanceId);
                 parentNode.setModelId(modelId);
@@ -195,9 +189,6 @@ public class ResourceInstanceRelationServiceImpl implements ResourceInstanceRela
                 Long modelId = relation.getTargetModelId();
                 String instanceId = relation.getTargetInstanceId();
                 ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(modelId);
-                if (!resourceModelEntity.getIsEnabled()) {
-                    continue;
-                }
                 ResourceInstanceTopologyVO childNode = new ResourceInstanceTopologyVO();
                 childNode.setInstanceRelationId(relation.getId());
                 childNode.setInstanceId(instanceId);

@@ -39,9 +39,6 @@ public class ResourceModelDTO {
     @Schema(description = "分组id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Long groupId;
 
-    @Schema(description = "是否启用", requiredMode = Schema.RequiredMode.REQUIRED, example = "true | false")
-    private Boolean isEnabled;
-
     @Schema(description = "分组名称", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "分组1")
     private String groupName;
 

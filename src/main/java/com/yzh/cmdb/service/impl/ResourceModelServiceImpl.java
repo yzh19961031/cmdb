@@ -22,10 +22,12 @@ import com.yzh.cmdb.mapper.ResourceModelMapper;
 import com.yzh.cmdb.mapper.ResourceRelationMapper;
 import com.yzh.cmdb.mapper.ResourceValidationMapper;
 import com.yzh.cmdb.service.ResourceModelService;
+import com.yzh.cmdb.utils.SQLGenerator;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,6 +73,9 @@ public class ResourceModelServiceImpl implements ResourceModelService {
     @Resource
     private ApplicationEventPublisher applicationEventPublisher;
 
+    @Resource
+    private JdbcTemplate jdbcTemplate;
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -108,10 +113,6 @@ public class ResourceModelServiceImpl implements ResourceModelService {
     public void delete(Long id) {
         // 删除模型
         ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(id);
-        // 是否停用
-        if (resourceModelEntity.getIsEnabled()) {
-            throw new CmdbException("请先停用该模型！！！");
-        }
         // 是否存在模型关联关系
         List<ResourceRelationEntity> resourceRelationEntities = resourceRelationMapper.selectList(
                 new LambdaQueryWrapper<ResourceRelationEntity>()
@@ -122,6 +123,10 @@ public class ResourceModelServiceImpl implements ResourceModelService {
             throw new CmdbException("该模型存在模型关联关系，无法删除！！！");
         }
 
+        // 判断模型下是否存在实例数据
+        if (instanceExist(resourceModelEntity.getTableName())) {
+            throw new IllegalArgumentException("该模型下存在实例数据，无法删除！！！");
+        }
         resourceModelMapper.deleteById(id);
         // 删除资源属性
         resourceAttributeMapper.delete(new LambdaQueryWrapper<ResourceAttributeEntity>().eq(ResourceAttributeEntity::getModelId, id));
@@ -142,7 +147,7 @@ public class ResourceModelServiceImpl implements ResourceModelService {
     }
 
     @Override
-    public List<GroupResourceModelVO> list(String name, Boolean isEnable) {
+    public List<GroupResourceModelVO> list(String name) {
         List<ResourceGroupEntity> resourceGroupEntities = resourceGroupMapper.selectList(null);
         if (CollectionUtils.isEmpty(resourceGroupEntities)) {
             return Collections.emptyList();
@@ -153,7 +158,6 @@ public class ResourceModelServiceImpl implements ResourceModelService {
             Long groupId = resourceGroupEntity.getId();
             List<ResourceModelEntity> resourceModelEntities = resourceModelMapper.selectList(new LambdaQueryWrapper<ResourceModelEntity>()
                     .like(StringUtils.isNotEmpty(name), ResourceModelEntity::getName, name)
-                    .eq(Objects.nonNull(isEnable), ResourceModelEntity::getIsEnabled, isEnable)
                     .eq(ResourceModelEntity::getGroupId, groupId));
             GroupResourceModelVO groupResourceModelVO = new GroupResourceModelVO();
             groupResourceModelVO.setId(groupId);
@@ -161,7 +165,6 @@ public class ResourceModelServiceImpl implements ResourceModelService {
             groupResourceModelVO.setDescription(resourceGroupEntity.getDescription());
             groupResourceModelVO.setResourceModelList(resourceModelEntities.stream()
                     .map(resourceModelEntity -> new ResourceModelVO()
-                            .setIsEnabled(resourceModelEntity.getIsEnabled())
                             .setId(resourceModelEntity.getId())
                             .setName(resourceModelEntity.getName()))
                     .collect(Collectors.toList()));
@@ -185,16 +188,6 @@ public class ResourceModelServiceImpl implements ResourceModelService {
                 }).collect(Collectors.toList());
         resourceModelDTO.setResourceAttributeDTOList(resourceAttributeDTOList);
         return resourceModelDTO;
-    }
-
-    @Override
-    public void doSwitch(Long id, Boolean isEnabled) {
-        ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(id);
-        if (Objects.equals(isEnabled, resourceModelEntity.getIsEnabled())) {
-            return;
-        }
-        resourceModelEntity.setIsEnabled(isEnabled);
-        resourceModelMapper.updateById(resourceModelEntity);
     }
 
     @Override
@@ -225,5 +218,17 @@ public class ResourceModelServiceImpl implements ResourceModelService {
         if (existsUniqueKey) {
             throw new IllegalArgumentException("唯一标识重复");
         }
+    }
+
+    /**
+     * 判断当前模型下是否存在实例
+     *
+     * @param tableName 表名
+     * @return T OR F
+     */
+    private boolean instanceExist(String tableName) {
+        String sql = SQLGenerator.generateCountSQL(tableName);
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class);
+        return Objects.nonNull(count) && count > 0;
     }
 }

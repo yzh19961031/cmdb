@@ -14,9 +14,5 @@ import lombok.experimental.Accessors;
 public class ResourceModelVO {
     private Long id;
     private String name;
-    /**
-     * 是否启用
-     */
-    private Boolean isEnabled;
 }
 

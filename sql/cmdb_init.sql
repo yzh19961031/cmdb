@@ -83,7 +83,6 @@ create table resource_model
     group_id    bigint                              null comment '分组id',
     table_name  varchar(64)                         null comment '表名',
     description text                                null comment '描述',
-    is_enabled  tinyint   default 0                 null comment '是否开启  0 未开启  1 开启',
     is_deleted  tinyint   default 0                 null comment '是否删除 0 未删除 1 已删除',
     create_at   timestamp default CURRENT_TIMESTAMP null comment '创建时间',
     modify_at   timestamp                           null on update CURRENT_TIMESTAMP comment '修改时间',

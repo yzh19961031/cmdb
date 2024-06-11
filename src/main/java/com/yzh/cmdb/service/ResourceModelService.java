@@ -32,10 +32,9 @@ public interface ResourceModelService {
      * 获取资源模型分组列表
      *
      * @param name 名称
-     * @param isEnable 是否启用
      * @return 资源模型分组列表
      */
-    List<GroupResourceModelVO> list(String name, Boolean isEnable);
+    List<GroupResourceModelVO> list(String name);
 
     /**
      * 批量删除
@@ -51,15 +50,6 @@ public interface ResourceModelService {
      * @return 模型详情
      */
     ResourceModelDTO detail(Long id);
-
-
-    /**
-     * 启停
-     *
-     * @param id 模型id
-     * @param isEnabled T 启用 F 不启用
-     */
-    void doSwitch(Long id, Boolean isEnabled);
 
 
     /**
