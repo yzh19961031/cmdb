@@ -78,6 +78,19 @@ public class ResourceModelController {
     }
 
     /**
+     * 更新资源模型
+     *
+     * @param resourceModelDTO 模型配置参数
+     * @return res
+     */
+    @PostMapping("update")
+    @Operation(summary = "更新资源模型")
+    public Result<Void> update(@Valid @RequestBody ResourceModelDTO resourceModelDTO) {
+        resourceModelService.update(resourceModelDTO);
+        return Result.ok();
+    }
+
+    /**
      * 获取资源模型分组列表
      *
      * @param name 名称

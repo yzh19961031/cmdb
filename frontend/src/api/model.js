@@ -46,3 +46,28 @@ export function listModel(name) {
     params: { name }
   })
 }
+
+
+export function addModel(data) {
+  return request({
+    url: '/model/add',
+    method: 'post',
+    data
+  })
+}
+
+export function deleteModel(id) {
+  return request({
+    url: '/model/delete',
+    method: 'post',
+    params: { id }
+  })
+}
+
+export function updateModel(data) {
+  return request({
+    url: '/model/update',
+    method: 'post',
+    data
+  })
+}

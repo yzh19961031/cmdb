@@ -33,7 +33,7 @@ public class ResourceModelDTO {
     private String uniqueKey;
 
     @Schema(description = "模型描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "xxxx")
-    @Size(max = 500, message = "分组描述长度不能超过500位")
+    @Size(max = 500, message = "模型描述长度不能超过500位")
     private String description;
 
     @Schema(description = "分组id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")

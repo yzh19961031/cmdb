@@ -58,4 +58,12 @@ public interface ResourceModelService {
      * @return 模型列表
      */
     List<ResourceModelVO> listAll();
+
+
+    /**
+     * 跟新资源模型
+     *
+     * @param resourceModelDTO 模型配置参数
+     */
+    void update(ResourceModelDTO resourceModelDTO);
 }

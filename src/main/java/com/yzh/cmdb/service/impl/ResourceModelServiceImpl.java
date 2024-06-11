@@ -15,7 +15,6 @@ import com.yzh.cmdb.domain.vo.ResourceModelVO;
 import com.yzh.cmdb.enums.ResourceAttributeEnum;
 import com.yzh.cmdb.event.CreateModelEvent;
 import com.yzh.cmdb.event.DeleteModelEvent;
-import com.yzh.cmdb.exception.CmdbException;
 import com.yzh.cmdb.mapper.ResourceAttributeMapper;
 import com.yzh.cmdb.mapper.ResourceGroupMapper;
 import com.yzh.cmdb.mapper.ResourceModelMapper;
@@ -113,20 +112,18 @@ public class ResourceModelServiceImpl implements ResourceModelService {
     public void delete(Long id) {
         // 删除模型
         ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(id);
-        // 是否存在模型关联关系
-        List<ResourceRelationEntity> resourceRelationEntities = resourceRelationMapper.selectList(
-                new LambdaQueryWrapper<ResourceRelationEntity>()
-                        .eq(ResourceRelationEntity::getSourceId, id)
-                        .or()
-                        .eq(ResourceRelationEntity::getTargetId, id));
-        if (CollectionUtils.isNotEmpty(resourceRelationEntities)) {
-            throw new CmdbException("该模型存在模型关联关系，无法删除！！！");
-        }
-
         // 判断模型下是否存在实例数据
         if (instanceExist(resourceModelEntity.getTableName())) {
             throw new IllegalArgumentException("该模型下存在实例数据，无法删除！！！");
         }
+
+        // 删除所有的模型关联
+        resourceRelationMapper.delete(
+                new LambdaQueryWrapper<ResourceRelationEntity>()
+                        .eq(ResourceRelationEntity::getSourceId, id)
+                        .or()
+                        .eq(ResourceRelationEntity::getTargetId, id));
+
         resourceModelMapper.deleteById(id);
         // 删除资源属性
         resourceAttributeMapper.delete(new LambdaQueryWrapper<ResourceAttributeEntity>().eq(ResourceAttributeEntity::getModelId, id));
@@ -166,7 +163,9 @@ public class ResourceModelServiceImpl implements ResourceModelService {
             groupResourceModelVO.setResourceModelList(resourceModelEntities.stream()
                     .map(resourceModelEntity -> new ResourceModelVO()
                             .setId(resourceModelEntity.getId())
-                            .setName(resourceModelEntity.getName()))
+                            .setName(resourceModelEntity.getName())
+                            .setDescription(resourceModelEntity.getDescription())
+                            .setUniqueKey(resourceModelEntity.getUniqueKey()))
                     .collect(Collectors.toList()));
             groupResourceModelVOList.add(groupResourceModelVO);
         });
@@ -201,6 +200,25 @@ public class ResourceModelServiceImpl implements ResourceModelService {
             BeanUtils.copyProperties(resourceModelEntity, resourceModelVO);
             return resourceModelVO;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public void update(ResourceModelDTO resourceModelDTO) {
+        Long id = resourceModelDTO.getId();
+        ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(id);
+        String originalName = resourceModelEntity.getName();
+        String name = resourceModelDTO.getName();
+
+        if (!StringUtils.equals(originalName, name)) {
+            boolean existsName = resourceModelMapper.exists(new LambdaQueryWrapper<ResourceModelEntity>()
+                    .eq(ResourceModelEntity::getName, name));
+            if (existsName) {
+                throw new IllegalArgumentException("模型名称重复！！！");
+            }
+        }
+        ResourceModelEntity entity = new ResourceModelEntity();
+        BeanUtils.copyProperties(resourceModelDTO, entity);
+        resourceModelMapper.updateById(entity);
     }
 
     private void checkResourceModel(ResourceModelDTO resourceModelDTO) {
