@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <el-container>
-      <el-header>
+      <el-header height="25px">
         <div style="display: flex; gap: 20px;">
           <el-link :class="{ active: isTableActive, largeText: true }" @click="showTable">表格形式</el-link>
           <el-link :class="{ active: !isTableActive, largeText: true }" @click="showTopology">拓扑形式</el-link>
@@ -52,7 +52,7 @@
             </el-table-column>
           </el-table>
         </div>
-        <div v-else id="topology"></div>
+        <div style="height: 650px;" v-else id="topology"></div>
       </el-main>
     </el-container>
   </div>

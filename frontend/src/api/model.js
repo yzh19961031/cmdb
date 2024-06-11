@@ -38,3 +38,11 @@ export function addRelation(data) {
     data
   })
 }
+
+export function listModel(name) {
+  return request({
+    url: '/model/list',
+    method: 'get',
+    params: { name }
+  })
+}
