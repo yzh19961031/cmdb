@@ -85,8 +85,7 @@ create table resource_model
     description text                                null comment '描述',
     is_deleted  tinyint   default 0                 null comment '是否删除 0 未删除 1 已删除',
     create_at   timestamp default CURRENT_TIMESTAMP null comment '创建时间',
-    modify_at   timestamp                           null on update CURRENT_TIMESTAMP comment '修改时间',
-    menus_id    bigint                              null comment '菜单id'
+    modify_at   timestamp                           null on update CURRENT_TIMESTAMP comment '修改时间'
 )
     comment '资源模型';
 
@@ -109,7 +108,6 @@ create table resource_validation
     id               bigint auto_increment comment '主键'
         primary key,
     model_id         bigint                              null comment '配置id',
-    index_name       varchar(255)                        null comment '联合索引名称',
     validate_columns varchar(512)                        null comment '唯一校验的列名 使用属性的标识拼接 用,分开',
     is_deleted       tinyint   default 0                 null comment '是否删除 0 未删除 1 已删除',
     create_at        timestamp default CURRENT_TIMESTAMP null comment '创建时间',
