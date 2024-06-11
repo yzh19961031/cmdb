@@ -347,14 +347,14 @@ export default {
 }
 </script>
 
-<style lang="scss">
-  .el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow {
-    display: none;
-  }
+<style lang="scss" scoped>
+    ::v-deep .el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow {
+      display: none;
+    }
 
-  .el-submenu>.el-submenu__title .el-submenu__icon-arrow {
+    ::v-deep .el-submenu>.el-submenu__title .el-submenu__icon-arrow {
     display: none;
-  }
+    }
 
   .dialog-title {
     display: flex;
