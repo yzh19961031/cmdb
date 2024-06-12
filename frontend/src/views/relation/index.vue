@@ -42,6 +42,11 @@
         prop="createAt"
         label="创建时间">
       </el-table-column>
+      <el-table-column label="操作">
+        <template slot-scope="scope">
+          <el-button size="mini" type="danger" @click="deleteRelation(scope.$index, scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
   </div>
 </template>
@@ -49,7 +54,8 @@
 
 <script>
 
-import {list, add} from "@/api/relation";
+import {list, add, deleteRel} from "@/api/relation";
+import {MessageBox} from "element-ui";
 
 export default {
   name: 'Relation',
@@ -73,6 +79,23 @@ export default {
   },
 
   methods: {
+    deleteRelation(index, row) {
+      MessageBox.confirm('是否确定删除?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteRel(row.id).then((response) => {
+          if (response.code === 0) {
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+            this.fetchData()
+          }
+        })
+      })
+    },
     fetchData() {
       list().then(response => {
         this.tableData = response.data

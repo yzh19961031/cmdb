@@ -14,3 +14,11 @@ export function add(data) {
     data
   })
 }
+
+export function deleteRel(id) {
+  return request({
+    url: '/relation/delete',
+    method: 'post',
+    params: { id }
+  })
+}

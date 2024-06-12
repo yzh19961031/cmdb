@@ -27,4 +27,11 @@ public interface RelationService {
      * @param relationTypeVO 关系类型详情
      */
     void add(RelationTypeVO relationTypeVO);
+
+    /**
+     * 删除关系类型
+     *
+     * @param id 关系类型id
+     */
+    void delete(Long id);
 }

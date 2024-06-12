@@ -115,6 +115,7 @@ import {list} from "@/api/relation";
 import {addModel, deleteModel, listModel, updateModel} from "@/api/model"
 import {add, drop, update} from "@/api/group"
 import {MessageBox} from "element-ui";
+import {resetObject} from "@/utils";
 
 export default {
   name: 'Relation',
@@ -165,11 +166,11 @@ export default {
   methods: {
     updateModel(groupId, model, event) {
       event.stopPropagation();
-      this.modelForm.name = model.name;
-      this.modelForm.groupId = groupId;
-      this.modelForm.id = model.id;
-      this.modelForm.uniqueKey = model.uniqueKey;
-      this.modelForm.description = model.description;
+      this.modelForm = {
+        ...this.modelForm,
+        ...model,
+        groupId: groupId
+      };
       this.modelDialogVisible = true;
       this.isModelEditing = true;
     },
@@ -293,18 +294,13 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields()
       if (formName === 'groupForm') {
-        this.groupForm.id = null
-        this.groupForm.name = ''
+        resetObject(this.groupForm)
         this.dialogVisible = false
         setTimeout(() => {
           this.isGroupEditing = false
         }, 100);
       } else if (formName === 'modelForm') {
-        this.modelForm.name = ''
-        this.modelForm.groupId = null
-        this.modelForm.id = null
-        this.modelForm.uniqueKey = ''
-        this.modelForm.description = ''
+        resetObject(this.modelForm)
         this.modelDialogVisible = false
         setTimeout(() => {
           this.isModelEditing = false;

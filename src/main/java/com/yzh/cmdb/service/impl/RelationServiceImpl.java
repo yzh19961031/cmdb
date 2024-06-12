@@ -2,9 +2,11 @@ package com.yzh.cmdb.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yzh.cmdb.domain.entity.RelationTypeEntity;
+import com.yzh.cmdb.domain.entity.ResourceRelationEntity;
 import com.yzh.cmdb.domain.vo.RelationTypeVO;
 import com.yzh.cmdb.exception.CmdbException;
 import com.yzh.cmdb.mapper.RelationTypeMapper;
+import com.yzh.cmdb.mapper.ResourceRelationMapper;
 import com.yzh.cmdb.service.RelationService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,9 @@ public class RelationServiceImpl implements RelationService {
 
     @Resource
     private RelationTypeMapper relationTypeMapper;
+
+    @Resource
+    private ResourceRelationMapper resourceRelationMapper;
 
 
     @Override
@@ -47,5 +52,14 @@ public class RelationServiceImpl implements RelationService {
         RelationTypeEntity relationTypeEntity = new RelationTypeEntity();
         BeanUtils.copyProperties(relationTypeVO, relationTypeEntity);
         relationTypeMapper.insert(relationTypeEntity);
+    }
+
+    @Override
+    public void delete(Long id) {
+        boolean exists = resourceRelationMapper.exists(new LambdaQueryWrapper<ResourceRelationEntity>().eq(ResourceRelationEntity::getRelationTypeId, id));
+        if (exists) {
+            throw new CmdbException("关系类型正在被使用！！！");
+        }
+        relationTypeMapper.deleteById(id);
     }
 }

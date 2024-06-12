@@ -115,3 +115,22 @@ export function param2Obj(url) {
   })
   return obj
 }
+
+
+export function resetObject(obj) {
+  Object.keys(obj).forEach(key => {
+    if (typeof obj[key] === 'string') {
+      obj[key] = '';
+    } else if (typeof obj[key] === 'number') {
+      obj[key] = null;
+    } else if (typeof obj[key] === 'boolean') {
+      obj[key] = false;
+    } else if (Array.isArray(obj[key])) {
+      obj[key] = [];
+    } else if (obj[key] !== null && typeof obj[key] === 'object') {
+      obj[key] = {};
+    } else {
+      obj[key] = null;
+    }
+  });
+}
