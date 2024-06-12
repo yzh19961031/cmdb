@@ -1,7 +1,7 @@
 <template>
   <div class="app-container" style="display: flex;height: 100vh;">
-    <el-dialog :title="isGroupEditing ? '编辑分组' : '新增分组'" width="600px" :visible.sync="dialogVisible"  :before-close="(done) => handleClose(done, 'groupForm')">
-      <el-form :model="groupForm" ref="groupForm" :rules="groupRules">
+    <el-dialog :title="isGroupEditing ? '编辑分组' : '新增分组'" width="600px" :visible.sync="dialogVisible" :before-close="(done) => handleClose(done, 'groupForm')">
+      <el-form ref="groupForm" :model="groupForm"  :rules="groupRules">
         <el-form-item label="分组名称" label-width="120px" prop="name">
           <el-input v-model="groupForm.name" placeholder="请输入分组名称"></el-input>
         </el-form-item>
@@ -38,11 +38,12 @@
       <el-menu
         class="el-menu-vertical-demo"
         :collapse="isCollapse"
-        :default-openeds="defaultOpened">
+        :default-openeds="defaultOpened"
+        @select="handleSelectModel">
         <el-submenu
           v-for="menu in models"
-          :key="menu.id"
-          :index="menu.id">
+          :key="menu.id  + ''"
+          :index="menu.id  + ''">
           <template slot="title">
             <div class="dialog-title">
               <div>
@@ -64,8 +65,8 @@
           </template>
           <el-menu-item
             v-for="submenu in menu.resourceModelList"
-            :key="submenu.id"
-            :index="submenu.id">
+            :key="submenu.id  + ''"
+            :index="submenu.id + ''">
             <div class="submenu-item dialog-title" @mouseenter="showIcons(submenu.id)" @mouseleave="hideIcons(submenu.id)">
               {{ submenu.name }}
               <div v-if="isHovering(submenu.id)">
@@ -81,48 +82,34 @@
         </el-submenu>
       </el-menu>
     </div>
-    <div class="main-content" style="flex: 1;padding: 20px;">
-      <!-- 右侧主内容区 -->
-      <el-table
-        :data="tableData"
-        border
-        style="width: 100%">
-        <el-table-column
-          prop="id"
-          label="ID"
-          width="180">
-        </el-table-column>
-        <el-table-column
-          prop="name"
-          label="关系名称"
-          width="300">
-        </el-table-column>
-        <el-table-column
-          prop="description"
-          label="关系描述">
-        </el-table-column>
-        <el-table-column
-          prop="createAt"
-          label="创建时间">
-        </el-table-column>
-      </el-table>
+
+    <div v-if="currentModelId" class="main-content">
+      <el-header class="custom-header">
+        <el-menu :default-active="'1'" class="el-menu-demo custom-menu" mode="horizontal">
+          <el-menu-item index="1">模型属性</el-menu-item>
+          <el-menu-item index="2">模型关联</el-menu-item>
+        </el-menu>
+      </el-header>
+      <el-main>
+      </el-main>
+    </div>
+    <div v-else class="main-content">
+      <el-empty :image-size="200"></el-empty>
     </div>
   </div>
 </template>
 
 <script>
-import {list} from "@/api/relation";
-import {addModel, deleteModel, listModel, updateModel} from "@/api/model"
-import {add, drop, update} from "@/api/group"
-import {MessageBox} from "element-ui";
-import {resetObject} from "@/utils";
+import { addModel, deleteModel, listModel, updateModel } from '@/api/model'
+import { add, drop, update } from '@/api/group'
+import { MessageBox } from 'element-ui'
+import { resetObject } from '@/utils'
 
 export default {
   name: 'Relation',
   data() {
     return {
       isCollapse: false,
-      tableData: [],
       models: [],
       /**
        * 默认全部打开
@@ -149,7 +136,7 @@ export default {
       },
       modelRules: {
         name: [{ required: true, message: '请输入模型名称', trigger: 'blur' },
-               { min: 2, max: 5, message: '模型名称长度必须在2到50个字符之间', trigger: 'blur' }],
+          { min: 2, max: 5, message: '模型名称长度必须在2到50个字符之间', trigger: 'blur' }],
 
         uniqueKey: [{ required: true, message: '请输入模型唯一标识', trigger: 'blur' },
           { min: 2, max: 5, message: '模型唯一标识长度必须在2到50个字符之间', trigger: 'blur' },
@@ -157,26 +144,29 @@ export default {
 
         description: [{ max: 500, message: '模型描述长度不能超过500位', trigger: 'blur' }]
       },
+      currentModelId: ''
     }
   },
   created() {
-    this.fetchData();
-    this.fetchMenuData(); // 获取菜单数据
+    this.fetchMenuData() // 获取菜单数据
   },
   methods: {
+    handleSelectModel(key) {
+      this.currentModelId = key
+    },
     updateModel(groupId, model, event) {
-      event.stopPropagation();
+      event.stopPropagation()
       this.modelForm = {
         ...this.modelForm,
         ...model,
         groupId: groupId
-      };
-      this.modelDialogVisible = true;
-      this.isModelEditing = true;
+      }
+      this.modelDialogVisible = true
+      this.isModelEditing = true
     },
 
     deleteModel(modelId, event) {
-      event.stopPropagation();
+      event.stopPropagation()
       MessageBox.confirm('是否确定删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -189,53 +179,52 @@ export default {
               type: 'success'
             })
             this.fetchMenuData()
+            // 清理当前模型
+            if (String(modelId) === this.currentModelId) {
+              this.currentModelId = ''
+            }
           }
         })
       })
     },
     addModel(groupId, event) {
-      event.stopPropagation();
-      this.modelDialogVisible = true;
-      this.modelForm.groupId = groupId;
+      event.stopPropagation()
+      this.modelDialogVisible = true
+      this.modelForm.groupId = groupId
     },
     showIcons(menuId) {
-      this.hoverMenuId = menuId;
+      this.hoverMenuId = menuId
     },
     hideIcons(menuId) {
-      this.hoverMenuId = null;
+      this.hoverMenuId = null
     },
     isHovering(menuId) {
-      return this.hoverMenuId === menuId;
+      return this.hoverMenuId === menuId
     },
     calculateDefaultOpened() {
-      this.defaultOpened = this.models.map(menu => menu.id);
-    },
-    fetchData() {
-      list().then(response => {
-        this.tableData = response.data;
-      });
+      this.defaultOpened = this.models.map(menu => menu.id + '')
     },
     fetchMenuData() {
       listModel(null).then(response => {
-        this.models = response.data;
-        this.calculateDefaultOpened();
-      });
+        this.models = response.data
+        this.calculateDefaultOpened()
+      })
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           switch (formName) {
-            case "groupForm":
-              this.doGroupForm();
-              break;
-            case "modelForm":
-              this.doModelForm();
-              break;
+            case 'groupForm':
+              this.doGroupForm()
+              break
+            case 'modelForm':
+              this.doModelForm()
+              break
           }
         } else {
-          return false;
+          return false
         }
-      });
+      })
     },
     doModelForm() {
       if (this.isModelEditing) {
@@ -298,24 +287,24 @@ export default {
         this.dialogVisible = false
         setTimeout(() => {
           this.isGroupEditing = false
-        }, 100);
+        }, 100)
       } else if (formName === 'modelForm') {
         resetObject(this.modelForm)
         this.modelDialogVisible = false
         setTimeout(() => {
-          this.isModelEditing = false;
-        }, 100);
+          this.isModelEditing = false
+        }, 100)
       }
     },
 
     handleClose(done, param) {
       this.resetForm(param)
       // 调用 done 函数以关闭对话框
-      done();
+      done()
     },
     deleteGroup(groupId, event) {
       // 阻止事件冒泡
-      event.stopPropagation();
+      event.stopPropagation()
       MessageBox.confirm('是否确定删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -333,24 +322,24 @@ export default {
       })
     },
     updateGroup(menu, event) {
-      event.stopPropagation();
-      this.groupForm.name = menu.name;
-      this.groupForm.id = menu.id;
-      this.dialogVisible = true;
-      this.isGroupEditing = true;
+      event.stopPropagation()
+      this.groupForm.name = menu.name
+      this.groupForm.id = menu.id
+      this.dialogVisible = true
+      this.isGroupEditing = true
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-    ::v-deep .el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow {
-      display: none;
-    }
-
-    ::v-deep .el-submenu>.el-submenu__title .el-submenu__icon-arrow {
+  ::v-deep .el-submenu.is-opened>.el-submenu__title .el-submenu__icon-arrow {
     display: none;
-    }
+  }
+
+  ::v-deep .el-submenu>.el-submenu__title .el-submenu__icon-arrow {
+  display: none;
+  }
 
   .dialog-title {
     display: flex;
@@ -369,5 +358,35 @@ export default {
   .icon-container i {
     margin-left: 0;
     cursor: pointer;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 2px;
+  }
+
+  .custom-header {
+    height: 30px;
+    padding: 0;
+  }
+
+  .custom-menu {
+    height: 30px;
+    line-height: 30px;
+  }
+
+  .custom-menu .el-menu-item {
+    padding: 0 15px;
+    height: 30px;
+    line-height: 30px;
+    font-weight: bold;
+  }
+
+  .custom-menu .el-menu-item:focus,
+  .custom-menu .el-menu-item:hover,
+  .custom-menu .el-menu-item.is-active {
+    border-bottom: 2px solid #409EFF;
+    margin-bottom: -2px;
+    font-weight: bold;
   }
 </style>
