@@ -199,7 +199,7 @@ export default {
       },
       modelRules: {
         name: [{ required: true, message: '请输入模型名称', trigger: 'blur' },
-          { min: 2, max: 5, message: '模型名称长度必须在2到50个字符之间', trigger: 'blur' }],
+          { min: 2, max: 50, message: '模型名称长度必须在2到50个字符之间', trigger: 'blur' }],
 
         uniqueKey: [{ required: true, message: '请输入模型唯一标识', trigger: 'blur' },
           { min: 2, max: 50, message: '模型唯一标识长度必须在2到50个字符之间', trigger: 'blur' },
@@ -293,6 +293,7 @@ export default {
     handleSelectModel(key) {
       this.currentModelId = key
       this.currentIndex = 'attr'
+      this.relationTableData = []
     },
     updateModel(groupId, model, event) {
       event.stopPropagation()
