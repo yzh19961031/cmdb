@@ -14,6 +14,14 @@ export function listAllRelation() {
   })
 }
 
+export function listRelation(modelId) {
+  return request({
+    url: '/model/relation/list',
+    method: 'get',
+    params: { modelId }
+  })
+}
+
 export function deleteRelation(id) {
   return request({
     url: '/model/relation/delete',

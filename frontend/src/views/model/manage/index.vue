@@ -31,6 +31,35 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="新增关系" label-width="100px" :visible.sync="relationDialogVisible" :before-close="(done) => handleClose(done, 'relationForm')">
+      <el-form :model="relationForm" ref="relationForm" :rules="relationRules">
+        <el-form-item label="源模型" label-width="120px" prop="sourceId">
+          <el-select v-model="relationForm.sourceId" placeholder="请选择源模型">
+            <el-option v-if="currentModel" :key="currentModel.id" :label="currentModel.name" :value="currentModel.id"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="目标模型" label-width="120px" prop="targetId">
+          <el-select v-model="relationForm.targetId" placeholder="请选择目标模型">
+            <el-option v-for="item in allModelList" :key="item.id" :label="item.name" :value="item.id"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="关联类型" label-width="120px" prop="relationTypeId">
+          <el-select v-model="relationForm.relationTypeId" placeholder="请选择活动区域">
+            <el-option v-for="item in relationList" :key="item.id" :label="item.name" :value="item.id"/>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="关系约束" label-width="120px" prop="relationBind">
+          <el-select v-model="relationForm.relationBind" placeholder="请选择关系约束">
+            <el-option v-for="item in relationBindList" :key="item.value" :label="item.label" :value="item.value"/>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="resetForm('relationForm')">取 消</el-button>
+        <el-button type="primary" @click="submitForm('relationForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+
     <div class="sidebar" style="width: 240px;border-right: 1px solid #ebeef5;">
       <div style="padding-left: 20px;">
         <el-button type="primary" size="small" @click="dialogVisible = true">新增分组</el-button>
@@ -39,7 +68,8 @@
         class="el-menu-vertical-demo"
         :collapse="isCollapse"
         :default-openeds="defaultOpened"
-        @select="handleSelectModel">
+        @select="handleSelectModel"
+        style="border-right: none;">
         <el-submenu
           v-for="menu in models"
           :key="menu.id  + ''"
@@ -84,13 +114,36 @@
     </div>
 
     <div v-if="currentModelId" class="main-content">
-      <el-header class="custom-header">
-        <el-menu :default-active="'1'" class="el-menu-demo custom-menu" mode="horizontal">
-          <el-menu-item index="1">模型属性</el-menu-item>
-          <el-menu-item index="2">模型关联</el-menu-item>
+      <el-header style="height: 30px; padding: 0;">
+        <el-menu @select="handleSelect" :default-active=currentIndex class="el-menu-demo custom-menu" mode="horizontal">
+          <el-menu-item index='attr'>模型属性</el-menu-item>
+          <el-menu-item index='relation'>模型关联</el-menu-item>
         </el-menu>
       </el-header>
-      <el-main>
+      <el-main style="padding-left: 10px; padding-top: 12px">
+        <el-button v-if="currentIndex === 'relation'" type="primary" size="small" @click="addModelRelation" plain>新增关系</el-button>
+        <el-button v-if="currentIndex === 'attr'" type="primary" size="small" plain>新增属性</el-button>
+        <el-button v-if="currentIndex === 'attr'" type="primary" size="small" plain>唯一校验</el-button>
+        <div style="margin-bottom: 10px;display: flex;justify-content: flex-start;"></div>
+        <el-table
+          v-if="currentIndex === 'relation'"
+          :data="relationTableData"
+          border
+          style="width: 100%">
+            <el-table-column prop="sourceModelName" label="源模型"/>
+            <el-table-column prop="relationName" label="关系"/>
+            <el-table-column prop="targetModelName" label="目标模型"/>
+            <el-table-column prop="relationBindName" label="关系约束"/>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-tooltip v-if="String(scope.row.sourceId) !== currentModelId" content="被动关联，无法删除" placement="top">
+                  <!-- 如果是目标端模型的话 不允许删除 -->
+                  <el-button size="mini" type="danger" @click="deleteRelation(scope.$index, scope.row)" :disabled="String(scope.row.sourceId) !== currentModelId">删除</el-button>
+                </el-tooltip>
+                <el-button v-else size="mini" type="danger" @click="deleteRelation(scope.$index, scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
       </el-main>
     </div>
     <div v-else class="main-content">
@@ -100,10 +153,20 @@
 </template>
 
 <script>
-import { addModel, deleteModel, listModel, updateModel } from '@/api/model'
+import {
+  addModel,
+  addRelation,
+  deleteModel,
+  deleteRelation,
+  listAll,
+  listModel,
+  listRelation,
+  updateModel
+} from '@/api/model'
 import { add, drop, update } from '@/api/group'
 import { MessageBox } from 'element-ui'
 import { resetObject } from '@/utils'
+import { list } from "@/api/relation"
 
 export default {
   name: 'Relation',
@@ -139,20 +202,97 @@ export default {
           { min: 2, max: 5, message: '模型名称长度必须在2到50个字符之间', trigger: 'blur' }],
 
         uniqueKey: [{ required: true, message: '请输入模型唯一标识', trigger: 'blur' },
-          { min: 2, max: 5, message: '模型唯一标识长度必须在2到50个字符之间', trigger: 'blur' },
+          { min: 2, max: 50, message: '模型唯一标识长度必须在2到50个字符之间', trigger: 'blur' },
           { pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: '模型唯一标识只允许字母开头，包含字母，数字和下划线', trigger: 'change' }],
 
         description: [{ max: 500, message: '模型描述长度不能超过500位', trigger: 'blur' }]
       },
-      currentModelId: ''
+      currentModelId: '',
+      /**
+       * 默认打开属性
+       */
+      currentIndex: 'attr',
+      relationTableData: [],
+      relationDialogVisible: false,
+      relationForm: {
+        sourceId: null,
+        targetId: null,
+        relationTypeId: null,
+        relationBind: null
+      },
+      relationRules: {
+        sourceId: [{ required: true, message: '请选择源模型', trigger: 'blur' }],
+        targetId: [{ required: true, message: '请选择目标模型', trigger: 'blur' }],
+        relationTypeId: [{ required: true, message: '请选择关联类型', trigger: 'blur' }],
+        relationBind: [{ required: true, message: '请选择关系约束', trigger: 'blur' }]
+      },
+      allModelList: [],
+      relationBindList: [
+        {
+          value: 0,
+          label: "一对一"
+        },
+        {
+          value: 1,
+          label: "一对多"
+        },
+        {
+          value: 2,
+          label: "多对多"
+        }
+      ],
+      relationList: []
     }
   },
   created() {
     this.fetchMenuData() // 获取菜单数据
   },
+  computed: {
+    currentModel() {
+      return this.allModelList.find(model => String(model.id) === this.currentModelId)
+    }
+  },
   methods: {
+    async addModelRelation() {
+      const [listAllResponse, listResponse] = await Promise.all([listAll(), list()])
+      this.allModelList = listAllResponse.data
+      this.relationList = listResponse.data
+      this.relationDialogVisible = true
+    },
+
+    deleteRelation(index, row) {
+      MessageBox.confirm('是否确定删除?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteRelation(row.id).then((response) => {
+          if (response.code === 0) {
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+            this.fetchListRelation()
+          }
+        })
+      })
+    },
+    fetchListRelation() {
+      listRelation(this.currentModelId).then(response => {
+        const initiativeList = response.data.initiativeList
+        const passiveList = response.data.passiveList
+        this.relationTableData = [...initiativeList, ...passiveList]
+      })
+    },
+    handleSelect(key) {
+      this.currentIndex = key
+      if (this.currentIndex === 'relation') {
+        this.fetchListRelation()
+      }
+    },
     handleSelectModel(key) {
       this.currentModelId = key
+      this.currentIndex = 'attr'
     },
     updateModel(groupId, model, event) {
       event.stopPropagation()
@@ -220,9 +360,25 @@ export default {
             case 'modelForm':
               this.doModelForm()
               break
+            case 'relationForm':
+              this.doRelationForm()
+              break
           }
         } else {
           return false
+        }
+      })
+    },
+    doRelationForm() {
+      // 提交表单
+      addRelation(this.relationForm).then(response => {
+        if (response.code === 0) {
+          this.$message({
+            message: '新增成功',
+            type: 'success'
+          })
+          this.resetForm('relationForm')
+          this.fetchListRelation()
         }
       })
     },
@@ -294,6 +450,9 @@ export default {
         setTimeout(() => {
           this.isModelEditing = false
         }, 100)
+      } else if (formName === 'relationForm') {
+        resetObject(this.relationForm)
+        this.relationDialogVisible = false
       }
     },
 
@@ -365,16 +524,6 @@ export default {
     padding: 2px;
   }
 
-  .custom-header {
-    height: 30px;
-    padding: 0;
-  }
-
-  .custom-menu {
-    height: 30px;
-    line-height: 30px;
-  }
-
   .custom-menu .el-menu-item {
     padding: 0 15px;
     height: 30px;
@@ -388,5 +537,9 @@ export default {
     border-bottom: 2px solid #409EFF;
     margin-bottom: -2px;
     font-weight: bold;
+  }
+
+  .el-select {
+    width: 100%;
   }
 </style>
