@@ -6,7 +6,7 @@
 
     <groupId>com.yzh</groupId>
     <artifactId>cmdb</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <description>配置管理数据库</description>
 
     <parent>

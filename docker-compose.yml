@@ -1,0 +1,29 @@
+version: '3'
+services:
+  cmdb-app:
+    container_name: cmdb-app
+    build:
+      context: .
+      dockerfile: build/Dockerfile
+    image: cmdb-app
+    environment:
+      - JAVA_OPTS=-Xms512m -Xmx512m
+      - SPRING_DATASOURCE_URL=jdbc:mysql://cmdb-db:3306/cmdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=123456
+    depends_on:
+      - cmdb-db
+    ports:
+      - "8900:8900"
+  cmdb-db:
+    container_name: cmdb-db
+    image: mysql:8.0.35
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      TZ: Asia/Shanghai
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./sql/cmdb_init.sql:/docker-entrypoint-initdb.d/cmdb_init.sql
+volumes:
+  db-data:
+    driver: local
