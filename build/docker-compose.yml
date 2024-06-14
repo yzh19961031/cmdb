@@ -3,7 +3,7 @@ services:
   cmdb-app:
     container_name: cmdb-app
     build:
-      context: .
+      context: ..
       dockerfile: build/Dockerfile
     image: cmdb-app
     environment:
@@ -23,7 +23,7 @@ services:
       TZ: Asia/Shanghai
     volumes:
       - db-data:/var/lib/mysql
-      - ./sql/cmdb_init.sql:/docker-entrypoint-initdb.d/cmdb_init.sql
+      - ../sql/cmdb_init.sql:/docker-entrypoint-initdb.d/cmdb_init.sql
 volumes:
   db-data:
     driver: local
