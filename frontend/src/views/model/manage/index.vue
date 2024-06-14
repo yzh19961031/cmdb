@@ -1,5 +1,5 @@
 <template>
-  <div class="app-container" style="display: flex;height: 100vh;">
+  <div class="app-container" style="display: flex">
     <el-dialog :title="isGroupEditing ? '编辑分组' : '新增分组'" width="600px" :visible.sync="dialogVisible" :before-close="(done) => handleClose(done, 'groupForm')">
       <el-form ref="groupForm" :model="groupForm"  :rules="groupRules">
         <el-form-item label="分组名称" label-width="120px" prop="name">

@@ -20,34 +20,37 @@
     <div class="header-bar">
       <el-button type="primary" @click="addRelation" class="add-relation-btn">新增关系类型</el-button>
     </div>
-    <el-table
-      :data="tableData"
-      border
-      style="width: 100%">
-      <el-table-column
-        prop="id"
-        label="ID"
-        width="180">
-      </el-table-column>
-      <el-table-column
-        prop="name"
-        label="关系名称"
-        width="300">
-      </el-table-column>
-      <el-table-column
-        prop="description"
-        label="关系描述">
-      </el-table-column>
-      <el-table-column
-        prop="createAt"
-        label="创建时间">
-      </el-table-column>
-      <el-table-column label="操作">
-        <template slot-scope="scope">
-          <el-button size="mini" type="danger" @click="deleteRelation(scope.$index, scope.row)">删除</el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+    <div style="padding-left: 20px;">
+      <el-table
+        :data="tableData"
+        border
+        style="width: 100%;">
+        <el-table-column
+          prop="id"
+          label="ID"
+          width="180">
+        </el-table-column>
+        <el-table-column
+          prop="name"
+          label="关系名称"
+          width="300">
+        </el-table-column>
+        <el-table-column
+          prop="description"
+          label="关系描述">
+        </el-table-column>
+        <el-table-column
+          prop="createAt"
+          label="创建时间">
+        </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button size="mini" type="danger" @click="deleteRelation(scope.$index, scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+
   </div>
 </template>
 
@@ -142,6 +145,7 @@ export default {
 <style lang="scss" scoped>
   .header-bar {
     margin-bottom: 10px; /* 调整按钮和表格之间的间距 */
+    padding-left: 20px;
     display: flex;
     justify-content: flex-start; /* 将按钮靠左对齐 */
   }
