@@ -15,6 +15,7 @@ public class ResourceModelVO {
     private Long id;
     private String name;
     private String uniqueKey;
+    private Boolean isEnabled;
     private String description;
 }
 

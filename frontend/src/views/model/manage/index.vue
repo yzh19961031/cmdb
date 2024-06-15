@@ -20,6 +20,9 @@
         <el-form-item label="模型唯一标识" label-width="120px" prop="uniqueKey">
           <el-input :disabled="isModelEditing" v-model="modelForm.uniqueKey" placeholder="模型唯一标识"></el-input>
         </el-form-item>
+        <el-form-item label="是否启用" label-width="120px" prop="isEnabled">
+          <el-switch v-model="modelForm.isEnabled"></el-switch>
+        </el-form-item>
         <el-form-item label="描述" label-width="120px" prop="description">
           <el-input type="textarea" v-model="modelForm.description" placeholder="请输入描述">
           </el-input>
@@ -126,6 +129,31 @@
         <el-button v-if="currentIndex === 'attr'" type="primary" size="small" plain>唯一校验</el-button>
         <div style="margin-bottom: 10px;display: flex;justify-content: flex-start;"></div>
         <el-table
+          v-if="currentIndex === 'attr'"
+          :data="attrTableData"
+          border
+          style="width: 100%">
+          <el-table-column prop="name" label="属性名称"/>
+          <el-table-column prop="identifier" label="属性标识"/>
+          <el-table-column prop="type" :formatter="formatAttrType" label="类型"/>
+          <el-table-column prop="isRequired" :formatter="formatBoolean" label="是否必填"/>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-button size="small" type="text">详情</el-button>
+              <el-tooltip v-if="scope.row.identifier === 'instance_name'" content="固定属性，无法编辑" placement="top">
+                <el-button disabled size="small" type="text">编辑</el-button>
+              </el-tooltip>
+              <el-tooltip v-if="scope.row.identifier === 'instance_name'" content="固定属性，无法删除" placement="top">
+                <el-button disabled size="small" type="text">删除</el-button>
+              </el-tooltip>
+              <template v-else>
+                <el-button size="small" type="text">编辑</el-button>
+                <el-button style="color: red"  size="small" type="text" @click="deleteAttr(scope.$index, scope.row)">删除</el-button>
+              </template>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-table
           v-if="currentIndex === 'relation'"
           :data="relationTableData"
           border
@@ -138,9 +166,9 @@
               <template slot-scope="scope">
                 <el-tooltip v-if="String(scope.row.sourceId) !== currentModelId" content="被动关联，无法删除" placement="top">
                   <!-- 如果是目标端模型的话 不允许删除 -->
-                  <el-button size="mini" type="danger" @click="deleteRelation(scope.$index, scope.row)" :disabled="String(scope.row.sourceId) !== currentModelId">删除</el-button>
+                  <el-button size="small" type="text" disabled>删除</el-button>
                 </el-tooltip>
-                <el-button v-else size="mini" type="danger" @click="deleteRelation(scope.$index, scope.row)">删除</el-button>
+                <el-button v-else style="color: red" size="small" type="text" @click="deleteRelation(scope.$index, scope.row)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -155,10 +183,10 @@
 <script>
 import {
   addModel,
-  addRelation,
+  addRelation, deleteAttr,
   deleteModel,
   deleteRelation,
-  listAll,
+  listAll, listAttr,
   listModel,
   listRelation,
   updateModel
@@ -195,6 +223,7 @@ export default {
         groupId: null,
         name: '',
         uniqueKey: '',
+        isEnabled: false,
         description: ''
       },
       modelRules: {
@@ -205,7 +234,8 @@ export default {
           { min: 2, max: 50, message: '模型唯一标识长度必须在2到50个字符之间', trigger: 'blur' },
           { pattern: /^[a-zA-Z][a-zA-Z0-9_]*$/, message: '模型唯一标识只允许字母开头，包含字母，数字和下划线', trigger: 'change' }],
 
-        description: [{ max: 500, message: '模型描述长度不能超过500位', trigger: 'blur' }]
+        description: [{ max: 500, message: '模型描述长度不能超过500位', trigger: 'blur' }],
+        isEnabled: [{ required: true}]
       },
       currentModelId: '',
       /**
@@ -241,7 +271,16 @@ export default {
           label: "多对多"
         }
       ],
-      relationList: []
+      relationList: [],
+      attrTableData: [],
+      attrTypeMap: {
+        0: '文本',
+        1: '整数',
+        2: '浮点数',
+        3: '日期',
+        4: '枚举',
+        5: '密码'
+      }
     }
   },
   created() {
@@ -284,15 +323,25 @@ export default {
         this.relationTableData = [...initiativeList, ...passiveList]
       })
     },
+    fetchAttrList() {
+      const queryData = { modelId: Number(this.currentModelId) }
+      listAttr(queryData).then(response => {
+        this.attrTableData = response.data
+      })
+    },
     handleSelect(key) {
       this.currentIndex = key
       if (this.currentIndex === 'relation') {
         this.fetchListRelation()
       }
+      if (this.currentIndex === 'attr') {
+        this.fetchAttrList()
+      }
     },
     handleSelectModel(key) {
       this.currentModelId = key
       this.currentIndex = 'attr'
+      this.fetchAttrList()
       this.relationTableData = []
     },
     updateModel(groupId, model, event) {
@@ -487,8 +536,30 @@ export default {
       this.groupForm.id = menu.id
       this.dialogVisible = true
       this.isGroupEditing = true
-    }
-  }
+    },
+    formatBoolean(row, column, cellValue) {
+      return cellValue === 'true' || cellValue === true ? '是' : '否'
+    },
+    formatAttrType(row, column, cellValue) {
+      return this.attrTypeMap[cellValue] || cellValue
+    },
+    deleteAttr(index, row) {
+      MessageBox.confirm('是否确定删除?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteAttr(+this.currentModelId, row.id).then((response) => {
+          if (response.code === 0) {
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+            this.fetchAttrList()
+          }
+        })
+      })
+    }  }
 }
 </script>
 

@@ -165,6 +165,7 @@ public class ResourceModelServiceImpl implements ResourceModelService {
                             .setId(resourceModelEntity.getId())
                             .setName(resourceModelEntity.getName())
                             .setDescription(resourceModelEntity.getDescription())
+                            .setIsEnabled(resourceModelEntity.getIsEnabled())
                             .setUniqueKey(resourceModelEntity.getUniqueKey()))
                     .collect(Collectors.toList()));
             groupResourceModelVOList.add(groupResourceModelVO);
@@ -214,6 +215,14 @@ public class ResourceModelServiceImpl implements ResourceModelService {
                     .eq(ResourceModelEntity::getName, name));
             if (existsName) {
                 throw new IllegalArgumentException("模型名称重复！！！");
+            }
+        }
+
+        Boolean originalEnabled = resourceModelEntity.getIsEnabled();
+        if (!Objects.equals(originalEnabled, resourceModelDTO.getIsEnabled()) && !resourceModelDTO.getIsEnabled()) {
+            // 如果是停用操作 判断是否存在示例数据
+            if (instanceExist(resourceModelEntity.getTableName())) {
+                throw new IllegalArgumentException("该模型下存在实例数据，无法停用，请先清空实例数据！！！");
             }
         }
         ResourceModelEntity entity = new ResourceModelEntity();

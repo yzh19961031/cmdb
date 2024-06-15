@@ -26,7 +26,7 @@ public class ResourceAttributeVO {
     @Schema(description = "可选项 如果输入框类型是下拉框 单选框 保存选项列表", requiredMode = Schema.RequiredMode.NOT_REQUIRED, example = "value1, value2")
     private String options;
 
-    @Schema(description = "是否必填", requiredMode = Schema.RequiredMode.REQUIRED, example = "true | false")
+    @Schema(description = "属性类型", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
     private Integer type;
 
     @Schema(description = "是否必填", requiredMode = Schema.RequiredMode.REQUIRED, example = "true | false")

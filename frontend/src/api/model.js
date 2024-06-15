@@ -79,3 +79,19 @@ export function updateModel(data) {
     data
   })
 }
+
+export function listAttr(data) {
+  return request({
+    url: '/model/attribute/list',
+    method: 'post',
+    data
+  })
+}
+
+export function deleteAttr(modelId, id) {
+  return request({
+    url: '/model/attribute/delete',
+    method: 'post',
+    params: { modelId, id }
+  })
+}

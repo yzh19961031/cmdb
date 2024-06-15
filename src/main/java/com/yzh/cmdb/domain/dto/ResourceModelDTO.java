@@ -32,6 +32,9 @@ public class ResourceModelDTO {
     @Size(min = 2, max = 50, message = "模型标识长度必须在2到50个字符之间")
     private String uniqueKey;
 
+    @Schema(description = "是否启用", requiredMode = Schema.RequiredMode.REQUIRED, example = "true | false")
+    private Boolean isEnabled;
+
     @Schema(description = "模型描述", requiredMode = Schema.RequiredMode.REQUIRED, example = "xxxx")
     @Size(max = 500, message = "模型描述长度不能超过500位")
     private String description;

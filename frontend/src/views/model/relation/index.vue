@@ -52,7 +52,7 @@
             </el-table-column>
           </el-table>
         </div>
-        <div style="height: 650px;" v-else id="topology"></div>
+        <div v-else id="topology"></div>
       </el-main>
     </el-container>
   </div>
