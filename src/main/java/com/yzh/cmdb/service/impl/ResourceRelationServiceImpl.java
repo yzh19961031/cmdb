@@ -157,9 +157,6 @@ public class ResourceRelationServiceImpl implements ResourceRelationService {
 
     private void checkResourceRelation(ResourceRelationDTO resourceRelationDTO) {
         List<ResourceRelationEntity> resourceRelationEntities = resourceRelationMapper.selectList(null);
-        if (CollectionUtils.isEmpty(resourceRelationEntities)) {
-            return;
-        }
 
         boolean match = resourceRelationEntities
                 .stream()
