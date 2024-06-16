@@ -15,6 +15,7 @@ import com.yzh.cmdb.domain.vo.ResourceModelVO;
 import com.yzh.cmdb.enums.ResourceAttributeEnum;
 import com.yzh.cmdb.event.CreateModelEvent;
 import com.yzh.cmdb.event.DeleteModelEvent;
+import com.yzh.cmdb.exception.CmdbException;
 import com.yzh.cmdb.mapper.ResourceAttributeMapper;
 import com.yzh.cmdb.mapper.ResourceGroupMapper;
 import com.yzh.cmdb.mapper.ResourceModelMapper;
@@ -112,9 +113,9 @@ public class ResourceModelServiceImpl implements ResourceModelService {
     public void delete(Long id) {
         // 删除模型
         ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(id);
-        // 判断模型下是否存在实例数据
-        if (instanceExist(resourceModelEntity.getTableName())) {
-            throw new IllegalArgumentException("该模型下存在实例数据，无法删除！！！");
+        // 判断是否停用
+        if (resourceModelEntity.getIsEnabled()) {
+            throw new CmdbException("该模型已启用，请先停用后再删除！！！");
         }
 
         // 删除所有的模型关联

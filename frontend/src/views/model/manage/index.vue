@@ -96,22 +96,44 @@
               </div>
             </div>
           </template>
-          <el-menu-item
-            v-for="submenu in menu.resourceModelList"
-            :key="submenu.id  + ''"
-            :index="submenu.id + ''">
-            <div class="submenu-item dialog-title" @mouseenter="showIcons(submenu.id)" @mouseleave="hideIcons(submenu.id)">
-              {{ submenu.name }}
-              <div v-if="isHovering(submenu.id)">
-                <el-tooltip content="编辑模型" placement="top" style="margin-left: 8px; margin-right: 8px">
-                  <i class="el-icon-edit" style="color: blue;font-size: 15px;" @click="updateModel(menu.id, submenu, $event)"></i>
-                </el-tooltip>
-                <el-tooltip content="删除模型" placement="top">
-                  <i class="el-icon-delete" style="color: red;font-size: 15px;" @click="deleteModel(submenu.id, $event)"></i>
-                </el-tooltip>
+          <el-menu-item-group v-if="menu.resourceModelList.some(model => model.isEnabled === true)">
+            <template slot="title">已启用</template>
+            <el-menu-item
+              v-for="submenu in menu.resourceModelList.filter(model => model.isEnabled === true)"
+              :key="submenu.id  + ''"
+              :index="submenu.id + ''">
+              <div class="submenu-item dialog-title" @mouseenter="showIcons(submenu.id)" @mouseleave="hideIcons(submenu.id)">
+                {{ submenu.name }}
+                <div v-if="isHovering(submenu.id)">
+                  <el-tooltip content="编辑模型" placement="top" style="margin-left: 8px; margin-right: 8px">
+                    <i class="el-icon-edit" style="color: blue;font-size: 15px;" @click="updateModel(menu.id, submenu, $event)"></i>
+                  </el-tooltip>
+                  <el-tooltip content="删除模型" placement="top">
+                    <i class="el-icon-delete" style="color: red;font-size: 15px;" @click="deleteModel(submenu.id, $event)"></i>
+                  </el-tooltip>
+                </div>
               </div>
-            </div>
-          </el-menu-item>
+            </el-menu-item>
+          </el-menu-item-group>
+          <el-menu-item-group v-if="menu.resourceModelList.some(model => model.isEnabled === false)">
+            <template slot="title">未启用</template>
+            <el-menu-item
+              v-for="submenu in menu.resourceModelList.filter(model => model.isEnabled === false)"
+              :key="submenu.id  + ''"
+              :index="submenu.id + ''">
+              <div class="submenu-item dialog-title" @mouseenter="showIcons(submenu.id)" @mouseleave="hideIcons(submenu.id)">
+                {{ submenu.name }}
+                <div v-if="isHovering(submenu.id)">
+                  <el-tooltip content="编辑模型" placement="top" style="margin-left: 8px; margin-right: 8px">
+                    <i class="el-icon-edit" style="color: blue;font-size: 15px;" @click="updateModel(menu.id, submenu, $event)"></i>
+                  </el-tooltip>
+                  <el-tooltip content="删除模型" placement="top">
+                    <i class="el-icon-delete" style="color: red;font-size: 15px;" @click="deleteModel(submenu.id, $event)"></i>
+                  </el-tooltip>
+                </div>
+              </div>
+            </el-menu-item>
+          </el-menu-item-group>
         </el-submenu>
       </el-menu>
     </div>
