@@ -52,7 +52,7 @@
             </el-table-column>
           </el-table>
         </div>
-        <div v-else id="topology"></div>
+        <div style="height: 650px;" v-else id="topology"></div>
       </el-main>
     </el-container>
   </div>
@@ -181,7 +181,7 @@ export default {
       const container = document.getElementById("topology");
       if (!container) return; // Ensure the container exists
       const width = container.scrollWidth;
-      const height = container.scrollHeight || 500;
+      const height = container.scrollHeight;
 
       // Destroy the existing graph if it exists
       if (this.graph) {

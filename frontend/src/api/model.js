@@ -95,3 +95,28 @@ export function deleteAttr(modelId, id) {
     params: { modelId, id }
   })
 }
+
+export function validationList(modelId) {
+  return request({
+    url: '/model/validation/list',
+    method: 'get',
+    params: { modelId }
+  })
+}
+
+
+export function deleteValidation(id) {
+  return request({
+    url: '/model/validation/delete',
+    method: 'post',
+    params: { id }
+  })
+}
+
+export function addValidation(data) {
+  return request({
+    url: '/model/validation/add',
+    method: 'post',
+    data
+  })
+}

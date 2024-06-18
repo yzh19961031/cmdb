@@ -63,6 +63,10 @@
       </div>
     </el-dialog>
 
+    <!-- 唯一校验 -->
+    <validation :validationDialogVisible="validationDialogVisible" :attrList="attrTableData" :modelId="+currentModelId"/>
+
+
     <div class="sidebar" style="width: 240px;border-right: 1px solid #ebeef5;">
       <div style="padding-left: 20px;">
         <el-button type="primary" size="small" @click="dialogVisible = true">新增分组</el-button>
@@ -148,7 +152,7 @@
       <el-main style="padding-left: 10px; padding-top: 12px">
         <el-button v-if="currentIndex === 'relation'" type="primary" size="small" @click="addModelRelation" plain>新增关系</el-button>
         <el-button v-if="currentIndex === 'attr'" type="primary" size="small" plain>新增属性</el-button>
-        <el-button v-if="currentIndex === 'attr'" type="primary" size="small" plain>唯一校验</el-button>
+        <el-button v-if="currentIndex === 'attr'" type="primary" size="small" @click="addModelValidation" plain>唯一校验</el-button>
         <div style="margin-bottom: 10px;display: flex;justify-content: flex-start;"></div>
         <el-table
           v-if="currentIndex === 'attr'"
@@ -217,9 +221,13 @@ import { add, drop, update } from '@/api/group'
 import { MessageBox } from 'element-ui'
 import { resetObject } from '@/utils'
 import { list } from "@/api/relation"
+import Validation from "@/views/model/manage/components/validation";
 
 export default {
   name: 'Relation',
+  components: {
+    Validation
+  },
   data() {
     return {
       isCollapse: false,
@@ -302,7 +310,8 @@ export default {
         3: '日期',
         4: '枚举',
         5: '密码'
-      }
+      },
+      validationDialogVisible: false
     }
   },
   created() {
@@ -314,6 +323,10 @@ export default {
     }
   },
   methods: {
+    // 新增唯一校验
+    addModelValidation() {
+      this.validationDialogVisible = true
+    },
     async addModelRelation() {
       const [listAllResponse, listResponse] = await Promise.all([listAll(), list()])
       this.allModelList = listAllResponse.data
