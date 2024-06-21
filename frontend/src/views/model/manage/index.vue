@@ -66,6 +66,12 @@
     <!-- 唯一校验 -->
     <validation :validationDialogVisible="validationDialogVisible" :attrList="attrTableData" :modelId="+currentModelId"/>
 
+    <!-- 模型属性 -->
+    <attribute :attrDialogVisible="attrDialogVisible" :isAttrEditing="isAttrEditing" :modelId="+currentModelId" :attrForm="attrForm"/>
+
+    <!-- 查看详情 -->
+    <attribute-detail :detailDrawerVisible="detailDrawerVisible" :attrForm="attrForm"/>
+
 
     <div class="sidebar" style="width: 240px;border-right: 1px solid #ebeef5;">
       <div style="padding-left: 20px;">
@@ -151,7 +157,7 @@
       </el-header>
       <el-main style="padding-left: 10px; padding-top: 12px">
         <el-button v-if="currentIndex === 'relation'" type="primary" size="small" @click="addModelRelation" plain>新增关系</el-button>
-        <el-button v-if="currentIndex === 'attr'" type="primary" size="small" plain>新增属性</el-button>
+        <el-button v-if="currentIndex === 'attr'" type="primary" size="small" @click="attrDialogVisible = true" plain>新增属性</el-button>
         <el-button v-if="currentIndex === 'attr'" type="primary" size="small" @click="addModelValidation" plain>唯一校验</el-button>
         <div style="margin-bottom: 10px;display: flex;justify-content: flex-start;"></div>
         <el-table
@@ -161,11 +167,11 @@
           style="width: 100%">
           <el-table-column prop="name" label="属性名称"/>
           <el-table-column prop="identifier" label="属性标识"/>
-          <el-table-column prop="type" :formatter="formatAttrType" label="类型"/>
+          <el-table-column prop="type" :formatter="formatAttrType" label="属性类型"/>
           <el-table-column prop="isRequired" :formatter="formatBoolean" label="是否必填"/>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button size="small" type="text">详情</el-button>
+              <el-button size="small" type="text" @click="detailAttr(scope.row)">详情</el-button>
               <el-tooltip v-if="scope.row.identifier === 'instance_name'" content="固定属性，无法编辑" placement="top">
                 <el-button disabled size="small" type="text">编辑</el-button>
               </el-tooltip>
@@ -173,7 +179,7 @@
                 <el-button disabled size="small" type="text">删除</el-button>
               </el-tooltip>
               <template v-else>
-                <el-button size="small" type="text">编辑</el-button>
+                <el-button size="small" type="text" @click="updateAttr(scope.$index, scope.row)">编辑</el-button>
                 <el-button style="color: red"  size="small" type="text" @click="deleteAttr(scope.$index, scope.row)">删除</el-button>
               </template>
             </template>
@@ -221,12 +227,14 @@ import { add, drop, update } from '@/api/group'
 import { MessageBox } from 'element-ui'
 import { resetObject } from '@/utils'
 import { list } from "@/api/relation"
-import Validation from "@/views/model/manage/components/validation";
+import Validation from "@/views/model/manage/components/validation"
+import Attribute from "@/views/model/manage/components/attribute"
+import AttributeDetail from "@/views/model/manage/components/attributeDetail"
 
 export default {
   name: 'Relation',
   components: {
-    Validation
+    Validation, Attribute, AttributeDetail
   },
   data() {
     return {
@@ -311,7 +319,20 @@ export default {
         4: '枚举',
         5: '密码'
       },
-      validationDialogVisible: false
+      validationDialogVisible: false,
+      attrDialogVisible: false,
+      isAttrEditing: false,
+      attrForm: {
+        isRequired: true,
+        name: '',
+        identifier: '',
+        type: '',
+        validationRule: '',
+        max: undefined,
+        min: undefined,
+        options: '',
+      },
+      detailDrawerVisible: false
     }
   },
   created() {
@@ -578,6 +599,15 @@ export default {
     formatAttrType(row, column, cellValue) {
       return this.attrTypeMap[cellValue] || cellValue
     },
+    detailAttr(row) {
+      this.detailDrawerVisible = true
+      this.attrForm = row
+    },
+    updateAttr(index, row) {
+      this.isAttrEditing = true
+      this.attrForm = row
+      this.attrDialogVisible = true
+    },
     deleteAttr(index, row) {
       MessageBox.confirm('是否确定删除?', '提示', {
         confirmButtonText: '确定',
@@ -594,7 +624,8 @@ export default {
           }
         })
       })
-    }  }
+    }
+  }
 }
 </script>
 

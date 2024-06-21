@@ -120,3 +120,19 @@ export function addValidation(data) {
     data
   })
 }
+
+export function addAttr(data) {
+  return request({
+    url: '/model/attribute/add',
+    method: 'post',
+    data
+  })
+}
+
+export function editAttr(data) {
+  return request({
+    url: '/model/attribute/update',
+    method: 'post',
+    data
+  })
+}

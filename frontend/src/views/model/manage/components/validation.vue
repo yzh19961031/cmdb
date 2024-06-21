@@ -42,7 +42,6 @@
         <el-button type="primary" plain size="mini" icon="el-icon-plus" @click="addEnum">增加校验</el-button>
       </el-form-item>
     </el-form>
-    <div slot="footer" class="dialog-footer"></div>
   </el-dialog>
 </template>
 
