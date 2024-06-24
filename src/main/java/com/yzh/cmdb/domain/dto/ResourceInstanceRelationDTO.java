@@ -21,8 +21,8 @@ public class ResourceInstanceRelationDTO {
      * 源端实例信息
      */
     @Schema(description = "源端实例id", requiredMode = Schema.RequiredMode.REQUIRED, example = "xxx-xxx")
-    @NotBlank(message = "源端实例id不能为空")
-    private String sourceInstanceId;
+    @NotNull(message = "源端实例id不能为空")
+    private Long sourceInstanceId;
 
     @Schema(description = "源端模型id", requiredMode = Schema.RequiredMode.REQUIRED, example = "123")
     @NotNull(message = "源端模型id不能为空")
@@ -32,8 +32,8 @@ public class ResourceInstanceRelationDTO {
      * 目标实例信息
      */
     @Schema(description = "目标端实例id", requiredMode = Schema.RequiredMode.REQUIRED, example = "xxx-xxx")
-    @NotBlank(message = "目标端实例id不能为空")
-    private String targetInstanceId;
+    @NotNull(message = "目标端实例id不能为空")
+    private Long targetInstanceId;
 
     @Schema(description = "目标端模型id", requiredMode = Schema.RequiredMode.REQUIRED, example = "123")
     @NotNull(message = "目标端模型id不能为空")

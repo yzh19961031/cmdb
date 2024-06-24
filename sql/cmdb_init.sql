@@ -56,9 +56,9 @@ create table resource_instance_relation
 (
     id                 bigint auto_increment
         primary key,
-    source_instance_id varchar(64)                         null comment '源端实例id',
+    source_instance_id bigint                              null comment '源端实例id',
     source_model_id    bigint                              null comment '源端模型id',
-    target_instance_id varchar(64)                         null comment '目标端实例id',
+    target_instance_id bigint                              null comment '目标端实例id',
     target_model_id    bigint                              null comment '目标端模型id',
     relation_type_id   bigint                              null comment '关系类型',
     relation_bind      tinyint                             null comment '关系约束',

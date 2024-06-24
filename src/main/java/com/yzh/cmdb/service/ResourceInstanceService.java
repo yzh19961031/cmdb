@@ -52,5 +52,5 @@ public interface ResourceInstanceService {
      * @param instanceId 实例id
      * @return 实例详情
      */
-    DynamicInstanceVO detail(Long modelId, String instanceId);
+    DynamicInstanceVO detail(Long modelId, Long instanceId);
 }

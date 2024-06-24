@@ -89,7 +89,7 @@ public class ResourceInstanceRelationController {
             @Parameter(name = "modelId", description = "模型id", required = true, in = ParameterIn.QUERY),
             @Parameter(name = "instanceId", description = "实例id", required = true, in = ParameterIn.QUERY)
     })
-    public Result<ResourceInstanceTopologyVO> recursiveTopology(@RequestParam("modelId") Long modelId, @RequestParam("instanceId") String instanceId) {
+    public Result<ResourceInstanceTopologyVO> recursiveTopology(@RequestParam("modelId") Long modelId, @RequestParam("instanceId") Long instanceId) {
         return Result.ok(resourceInstanceRelationService.recursiveTopology(modelId, instanceId));
     }
 
@@ -107,7 +107,7 @@ public class ResourceInstanceRelationController {
             @Parameter(name = "modelId", description = "模型id", required = true, in = ParameterIn.QUERY),
             @Parameter(name = "instanceId", description = "实例id", required = true, in = ParameterIn.QUERY)
     })
-    public Result<ListResourceInstanceRelationVO> list(@RequestParam("modelId") Long modelId, @RequestParam("instanceId") String instanceId) {
+    public Result<ListResourceInstanceRelationVO> list(@RequestParam("modelId") Long modelId, @RequestParam("instanceId") Long instanceId) {
         return Result.ok(resourceInstanceRelationService.list(modelId, instanceId));
     }
 

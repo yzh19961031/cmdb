@@ -55,9 +55,10 @@ public interface ResourceModelService {
     /**
      * 获取所有的模型列表
      *
+     * @param isEnabled 是否启用 T OR F
      * @return 模型列表
      */
-    List<ResourceModelVO> listAll();
+    List<ResourceModelVO> listAll(Boolean isEnabled);
 
 
     /**

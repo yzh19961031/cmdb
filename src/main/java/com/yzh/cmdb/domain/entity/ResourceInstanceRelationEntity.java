@@ -24,13 +24,13 @@ public class ResourceInstanceRelationEntity extends BaseEntity {
     /**
      * 源端实例信息
      */
-    private String sourceInstanceId;
+    private Long sourceInstanceId;
     private Long sourceModelId;
 
     /**
      * 目标实例信息
      */
-    private String targetInstanceId;
+    private Long targetInstanceId;
     private Long targetModelId;
 
     /**

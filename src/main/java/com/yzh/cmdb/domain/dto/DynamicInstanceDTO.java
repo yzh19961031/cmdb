@@ -19,7 +19,7 @@ public class DynamicInstanceDTO {
     private Long modelId;
 
     @Schema(description = "实例id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    private String instanceId;
+    private Long instanceId;
 
     /**
      * 实例的数据 按照下面的格式接收

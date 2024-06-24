@@ -27,7 +27,7 @@ public class ResourceModelEntity extends BaseEntity {
     private Long groupId;
     private Boolean isEnabled;
     /**
-     * 表名称 生成规则 mongodb的objectId
+     * 表名称 生成规则 cmdb_{{uniqueKey}}
      */
     private String tableName;
 }

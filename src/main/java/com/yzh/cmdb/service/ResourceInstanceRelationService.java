@@ -36,7 +36,7 @@ public interface ResourceInstanceRelationService {
      * @param instanceId 实例id
      * @return 拓扑详情
      */
-    ResourceInstanceTopologyVO recursiveTopology(Long modelId, String instanceId);
+    ResourceInstanceTopologyVO recursiveTopology(Long modelId, Long instanceId);
 
     /**
      * 获取指定实例列表
@@ -45,7 +45,7 @@ public interface ResourceInstanceRelationService {
      * @param instanceId 实例id
      * @return 实例列表
      */
-    ListResourceInstanceRelationVO list(Long modelId, String instanceId);
+    ListResourceInstanceRelationVO list(Long modelId, Long instanceId);
 
     /**
      * 批量添加实例关联关系

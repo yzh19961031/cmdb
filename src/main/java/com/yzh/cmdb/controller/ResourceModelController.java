@@ -107,12 +107,13 @@ public class ResourceModelController {
     /**
      * 获取所有的模型列表
      *
+     * @param isEnabled 是否启用 T OR F
      * @return 模型列表
      */
     @GetMapping("listAll")
     @Operation(summary = "获取所有的模型列表")
-    public Result<List<ResourceModelVO>> listAll() {
-        return Result.ok(resourceModelService.listAll());
+    public Result<List<ResourceModelVO>> listAll(@RequestParam(name = "isEnabled", required = false) Boolean isEnabled) {
+        return Result.ok(resourceModelService.listAll(isEnabled));
     }
 
 

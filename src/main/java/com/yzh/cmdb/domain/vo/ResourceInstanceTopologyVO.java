@@ -18,7 +18,7 @@ public class ResourceInstanceTopologyVO {
     private Long instanceRelationId;
 
     @Schema(description = "选择的实例id", requiredMode = Schema.RequiredMode.REQUIRED, example = "xxxx")
-    private String instanceId;
+    private Long instanceId;
 
     @Schema(description = "选择的实例名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "实例1")
     private String instanceName;

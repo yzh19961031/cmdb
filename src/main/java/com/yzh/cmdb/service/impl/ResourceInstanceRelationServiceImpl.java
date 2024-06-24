@@ -64,7 +64,7 @@ public class ResourceInstanceRelationServiceImpl implements ResourceInstanceRela
     }
 
     @Override
-    public ResourceInstanceTopologyVO recursiveTopology(Long modelId, String instanceId) {
+    public ResourceInstanceTopologyVO recursiveTopology(Long modelId, Long instanceId) {
         // 创建根节点
         ResourceInstanceTopologyVO root = new ResourceInstanceTopologyVO();
         root.setInstanceId(instanceId);
@@ -80,7 +80,7 @@ public class ResourceInstanceRelationServiceImpl implements ResourceInstanceRela
     }
 
     @Override
-    public ListResourceInstanceRelationVO list(Long modelId, String instanceId) {
+    public ListResourceInstanceRelationVO list(Long modelId, Long instanceId) {
         List<ResourceInstanceRelationVO> children = new ArrayList<>();
         // 子节点
         List<ResourceRelationEntity> childResourceRelationEntities = resourceRelationMapper.selectList(new LambdaQueryWrapper<ResourceRelationEntity>()
@@ -165,7 +165,7 @@ public class ResourceInstanceRelationServiceImpl implements ResourceInstanceRela
             for (ResourceInstanceRelationEntity relation : parentRelations) {
                 ResourceInstanceTopologyVO parentNode = new ResourceInstanceTopologyVO();
                 Long modelId = relation.getSourceModelId();
-                String instanceId = relation.getSourceInstanceId();
+                Long instanceId = relation.getSourceInstanceId();
                 ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(modelId);
                 if (!resourceModelEntity.getIsEnabled()) {
                     continue;
@@ -193,7 +193,7 @@ public class ResourceInstanceRelationServiceImpl implements ResourceInstanceRela
             List<ResourceInstanceTopologyVO> children = new ArrayList<>();
             for (ResourceInstanceRelationEntity relation : childrenRelations) {
                 Long modelId = relation.getTargetModelId();
-                String instanceId = relation.getTargetInstanceId();
+                Long instanceId = relation.getTargetInstanceId();
                 ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(modelId);
                 if (!resourceModelEntity.getIsEnabled()) {
                     continue;
@@ -220,15 +220,15 @@ public class ResourceInstanceRelationServiceImpl implements ResourceInstanceRela
      * @param instanceId 实例id
      * @return 实例名称
      */
-    private String getInstanceName(String tableName, String instanceId) {
+    private String getInstanceName(String tableName, Long instanceId) {
         return jdbcTemplate.queryForObject("SELECT instance_name FROM " + tableName + " WHERE id = ?", String.class, instanceId);
     }
 
     private ResourceInstanceRelationEntity checkResourceInstanceRelation(ResourceInstanceRelationDTO resourceInstanceRelationDTO) {
         Objects.requireNonNull(resourceInstanceRelationDTO, "实例关联参数不能为空！！！");
-        String sourceInstanceId = resourceInstanceRelationDTO.getSourceInstanceId();
+        Long sourceInstanceId = resourceInstanceRelationDTO.getSourceInstanceId();
         Long sourceModelId = resourceInstanceRelationDTO.getSourceModelId();
-        String targetInstanceId = resourceInstanceRelationDTO.getTargetInstanceId();
+        Long targetInstanceId = resourceInstanceRelationDTO.getTargetInstanceId();
         Long targetModelId = resourceInstanceRelationDTO.getTargetModelId();
         // 是否重复添加
         boolean relationExists = resourceInstanceRelationMapper.exists(new LambdaQueryWrapper<ResourceInstanceRelationEntity>()

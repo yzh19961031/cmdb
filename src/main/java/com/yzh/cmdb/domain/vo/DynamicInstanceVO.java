@@ -20,7 +20,7 @@ public class DynamicInstanceVO {
     /**
      * 实例id
      */
-    private String instanceId;
+    private Long instanceId;
 
 
     /**

@@ -1,6 +1,5 @@
 package com.yzh.cmdb.service.impl;
 
-import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yzh.cmdb.domain.dto.ColumnDefinitionDTO;
 import com.yzh.cmdb.domain.dto.ResourceAttributeDTO;
@@ -52,7 +51,7 @@ public class ResourceModelServiceImpl implements ResourceModelService {
      * 默认表字段
      */
     private static final List<ColumnDefinitionDTO> DEFAULT_COLUMN_LIST = Arrays.asList(
-            new ColumnDefinitionDTO().setColumnName("id").setColumnType("VARCHAR(64) PRIMARY KEY"),
+            new ColumnDefinitionDTO().setColumnName("id").setColumnType("BIGINT AUTO_INCREMENT PRIMARY KEY"),
             new ColumnDefinitionDTO().setColumnName("instance_name").setColumnType("VARCHAR(255)"));
 
     @Resource
@@ -85,7 +84,7 @@ public class ResourceModelServiceImpl implements ResourceModelService {
         ResourceModelEntity resourceModelEntity = new ResourceModelEntity();
         BeanUtils.copyProperties(resourceModelDTO, resourceModelEntity);
         // 设置表名
-        String tableName = "cmdb_" + IdUtil.objectId();
+        String tableName = "cmdb_" + resourceModelDTO.getUniqueKey();
         resourceModelEntity.setTableName(tableName);
         resourceModelMapper.insert(resourceModelEntity);
         Long modelId = resourceModelEntity.getId();
@@ -192,8 +191,10 @@ public class ResourceModelServiceImpl implements ResourceModelService {
     }
 
     @Override
-    public List<ResourceModelVO> listAll() {
-        List<ResourceModelEntity> resourceModelEntities = resourceModelMapper.selectList(null);
+    public List<ResourceModelVO> listAll(Boolean isEnabled) {
+        LambdaQueryWrapper<ResourceModelEntity> queryWrapper = new LambdaQueryWrapper<ResourceModelEntity>()
+                .eq(Objects.nonNull(isEnabled), ResourceModelEntity::getIsEnabled, isEnabled);
+        List<ResourceModelEntity> resourceModelEntities = resourceModelMapper.selectList(queryWrapper);
         if (CollectionUtils.isEmpty(resourceModelEntities)) {
             return Collections.emptyList();
         }

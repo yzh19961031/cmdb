@@ -3,7 +3,6 @@ package com.yzh.cmdb.domain.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -19,6 +18,6 @@ public class InstanceDeleteDTO {
     private Long modelId;
 
     @Schema(description = "实例id", requiredMode = Schema.RequiredMode.REQUIRED, example = "1")
-    @NotBlank(message = "实例id不能为空")
-    private String instanceId;
+    @NotNull(message = "实例id不能为空")
+    private Long instanceId;
 }

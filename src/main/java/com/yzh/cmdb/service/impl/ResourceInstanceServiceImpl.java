@@ -71,7 +71,6 @@ public class ResourceInstanceServiceImpl implements ResourceInstanceService {
         this.checkInstanceDTO(dynamicInstanceDTO);
         ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(dynamicInstanceDTO.getModelId());
         Map<String, Object> data = dynamicInstanceDTO.getData();
-        data.put("id", IdUtil.fastSimpleUUID());
         String insertSQL = SQLGenerator.generateInsertSQL(resourceModelEntity.getTableName(), data.keySet());
         jdbcTemplate.update(insertSQL, data.values().toArray());
     }
@@ -80,7 +79,7 @@ public class ResourceInstanceServiceImpl implements ResourceInstanceService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delete(InstanceDeleteDTO deleteDTO) {
-        String instanceId = deleteDTO.getInstanceId();
+        Long instanceId = deleteDTO.getInstanceId();
         Long modelId = deleteDTO.getModelId();
         ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(modelId);
         String tableName = resourceModelEntity.getTableName();
@@ -106,7 +105,7 @@ public class ResourceInstanceServiceImpl implements ResourceInstanceService {
             // 参数组装
             queryResult.forEach(result -> {
                 DynamicInstanceVO dynamicInstanceVO = new DynamicInstanceVO();
-                dynamicInstanceVO.setInstanceId(result.get("id").toString());
+                dynamicInstanceVO.setInstanceId((long) result.get("id"));
                 List<DynamicInstanceVO.Attributes> attributes = result.entrySet()
                         .stream()
                         .filter(entry -> !StringUtils.equals("id", entry.getKey()))
@@ -137,7 +136,7 @@ public class ResourceInstanceServiceImpl implements ResourceInstanceService {
     }
 
     @Override
-    public DynamicInstanceVO detail(Long modelId, String instanceId) {
+    public DynamicInstanceVO detail(Long modelId, Long instanceId) {
         ResourceModelEntity resourceModelEntity = resourceModelMapper.selectById(modelId);
         String tableName = resourceModelEntity.getTableName();
         String selectSQL = SQLGenerator.generateSelectSQL(tableName, Collections.singletonList("*"), Collections.singletonList("id"));
