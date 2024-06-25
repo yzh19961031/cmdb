@@ -31,9 +31,6 @@ const permission = {
      */
     GenerateRoutes({ commit }, menus) {
       return new Promise((resolve) => {
-        menus.forEach(element => {
-            element.component = "resource/index";
-        });
         const sidebarRoutes = filterAsyncRouter(menus);
         const rewriteRoutes = filterAsyncRouter(menus);
         commit("SET_ROUTES", rewriteRoutes);

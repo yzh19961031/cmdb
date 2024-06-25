@@ -758,7 +758,7 @@ export default {
             });
             this.resetForm("modelForm");
             // this.fetchMenuData();
-            this.$route.go(0)
+            this.$router.go(0)
           }
         });
       } else {

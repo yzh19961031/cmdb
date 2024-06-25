@@ -5,7 +5,6 @@ import NProgress from "nprogress"; // progress bar
 import "nprogress/nprogress.css"; // progress bar style
 import { getToken } from "@/utils/auth"; // get token from cookie
 import getPageTitle from "@/utils/get-page-title";
-import Layout from "@/layout";
 NProgress.configure({ showSpinner: false }); // NProgress Configuration
 
 const whiteList = ["/login"]; // no redirect whitelist
@@ -16,11 +15,11 @@ router.beforeEach(async (to, from, next) => {
 
   // set page title
   document.title = getPageTitle(to.meta.title);
-
   // determine whether the user has logged in
   const hasToken = getToken();
+  console.log(hasToken);
   if (hasToken) {
-    if (store.state.models.models.length === 0) {
+    if (!store.state.models.modelsFlag) {
       await store.dispatch("models/fetchModels").then((menus) => {
         store.dispatch("GenerateRoutes", menus).then((accessRoutes) => {
           // 将动态路由信息添加到router.options.routes 生成侧边栏
@@ -29,7 +28,6 @@ router.beforeEach(async (to, from, next) => {
             ...accessRoutes,
             { path: "*", redirect: "/404", hidden: true },
           ];
-
           // { path: "*", redirect: "/404", hidden: true } 一定要最后添加
           router.addRoutes([
             ...accessRoutes,
