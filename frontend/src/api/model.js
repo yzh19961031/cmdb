@@ -31,10 +31,11 @@ export function deleteRelation(id) {
 }
 
 
-export function listAll() {
+export function listAll(isEnabled) {
   return request({
     url: '/model/listAll',
-    method: 'get'
+    method: 'get',
+    params: { isEnabled }
   })
 }
 
@@ -134,5 +135,13 @@ export function editAttr(data) {
     url: '/model/attribute/update',
     method: 'post',
     data
+  })
+}
+
+export function modelDetail(id) {
+  return request({
+    url: '/model/detail',
+    method: 'get',
+    params: { id }
   })
 }

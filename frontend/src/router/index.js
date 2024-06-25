@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from '@/store'
 
 Vue.use(Router)
 
@@ -32,93 +33,80 @@ import Layout from '@/layout'
  */
 export const constantRoutes = [
   {
-    path: '/login',
-    component: () => import('@/views/login/index'),
-    hidden: true
+    path: "/login",
+    component: () => import("@/views/login/index"),
+    hidden: true,
   },
 
   {
-    path: '/404',
-    component: () => import('@/views/404'),
-    hidden: true
+    path: "/404",
+    component: () => import("@/views/404"),
+    hidden: true,
   },
 
   {
-    path: '/',
+    path: "/",
     component: Layout,
-    redirect: '/dashboard',
-    children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
-      component: () => import('@/views/dashboard/index'),
-      meta: { title: '主页', icon: 'dashboard' }
-    }]
-  },
-
-  {
-    path: '/instance',
-    component: Layout,
-    redirect: '/instance',
-    name: '资源管理',
-    children: [{
-      path: 'instance',
-      name: '资源管理',
-      component: () => import('@/views/instance/index'),
-      meta: { title: '资源管理', icon: 'el-icon-files' }
-    }]
-  },
-
-  {
-    path: '/model',
-    component: Layout,
-    redirect: '/model',
-    name: '模型管理',
-    meta: { title: '模型管理', icon: 'el-icon-s-help' },
+    redirect: "/dashboard",
     children: [
       {
-        path: 'manage',
-        name: '模型配置',
-        component: () => import('@/views/model/manage/index'),
-        meta: { title: '模型配置', icon: 'el-icon-s-operation' }
+        path: "/dashboard",
+        name: "Dashboard",
+        component: () => import("@/views/dashboard/index"),
+        meta: { title: "主页", icon: "dashboard" },
+      },
+    ],
+  },
+  {
+    path: "/model",
+    component: Layout,
+    redirect: "/model",
+    name: "模型管理",
+    meta: { title: "模型管理", icon: "el-icon-s-help" },
+    children: [
+      {
+        path: "/model/manage",
+        name: "模型配置",
+        component: () => import("@/views/model/manage/index"),
+        meta: { title: "模型配置", icon: "el-icon-s-operation" },
       },
       {
-        path: 'relation',
-        name: '模型关系',
-        component: () => import('@/views/model/relation/index'),
-        meta: { title: '模型关系', icon: 'el-icon-set-up' }
-      }
-    ]
+        path: "/model/relation",
+        name: "模型关系",
+        component: () => import("@/views/model/relation/index"),
+        meta: { title: "模型关系", icon: "el-icon-set-up" },
+      },
+    ],
   },
 
   {
-    path: '/relation',
+    path: "/relation",
     component: Layout,
-    redirect: '/relation',
-    name: '关系类型',
-    children: [{
-      path: 'relation',
-      name: '关系类型',
-      component: () => import('@/views/relation/index'),
-      meta: { title: '关系类型', icon: 'el-icon-coin' }
-    }]
+    redirect: "/relation",
+    name: "关系类型",
+    children: [
+      {
+        path: "/relation",
+        name: "关系类型",
+        component: () => import("@/views/relation/index"),
+        meta: { title: "关系类型", icon: "el-icon-coin" },
+      },
+    ],
   },
-
   // 404 page must be placed at the end !!!
-  { path: '*', redirect: '/404', hidden: true }
-]
+  
+  
+];
+  //防止连续点击多次路由报错;
+let routerPush = Router.prototype.push;
+Router.prototype.push = function push(location) {
+  return routerPush.call(this, location).catch((err) => err);
+};
 
-const createRouter = () => new Router({
-  // mode: 'history', // require service support
+// export default router
+export default new Router({
+   mode: 'hash', 
   scrollBehavior: () => ({ y: 0 }),
-  routes: constantRoutes
-})
+  routes: constantRoutes,
+});
 
-const router = createRouter()
-
-// Detail see: https://github.com/vuejs/vue-router/issues/1234#issuecomment-357941465
-export function resetRouter() {
-  const newRouter = createRouter()
-  router.matcher = newRouter.matcher // reset router
-}
-
-export default router
