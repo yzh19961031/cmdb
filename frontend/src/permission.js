@@ -23,9 +23,11 @@ router.beforeEach(async (to, from, next) => {
       await store.dispatch("models/fetchModels").then((menus) => {
         store.dispatch("GenerateRoutes", menus).then((accessRoutes) => {
           // 将动态路由信息添加到router.options.routes 生成侧边栏
+          // 切换动态路由到首页下方
+           router.options.routes.splice(3, 0, ...accessRoutes);
+          //  添加404页面，最后添加 important
           router.options.routes = [
             ...router.options.routes,
-            ...accessRoutes,
             { path: "*", redirect: "/404", hidden: true },
           ];
           // { path: "*", redirect: "/404", hidden: true } 一定要最后添加
@@ -35,7 +37,6 @@ router.beforeEach(async (to, from, next) => {
           ]); // 动态添加可访问路由表
         });
         next({ ...to, replace: true }); // hack方法 确保addRoutes已完成
-        console.log(router);
       });
     } else {
       return next();

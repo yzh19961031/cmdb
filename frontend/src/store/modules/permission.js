@@ -1,11 +1,11 @@
-import  { constantRoutes } from "@/router";
+import {constantRoutes} from "@/router";
 import Layout from "@/layout";
 const permission = {
   state: {
     routes: [],
     addRoutes: [],
-    sidebarRouters: [], 
-    topbarRouters: [], 
+    sidebarRouters: [],
+    topbarRouters: [],
   },
   mutations: {
     SET_ROUTES: (state, routes) => {
